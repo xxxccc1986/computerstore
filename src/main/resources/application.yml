@@ -32,7 +32,7 @@ pagehelper:
 server:
   #本地项目的写法
   port: 8080
-  ip；127.0.0.1
+  ip: 127.0.0.1
 #  部署服务器的写法
 #  ip: 服务器ip地址
 #  port: 8080
