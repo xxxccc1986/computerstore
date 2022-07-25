@@ -35,7 +35,8 @@ public class FileController extends BaseController{
     private String ip;
     @Value("${server.port}")
     private String port;
-    @Value("${server.filePath}")
+    //@Value("${server.filePath}")
+    //线上部署才需要使用这个参数，本地运行不需要
     private String filePath;
 
     //设置文件限制大小
