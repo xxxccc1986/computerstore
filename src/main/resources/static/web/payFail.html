@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html>
+
+	<head>
+		<meta charset="UTF-8">
+		<!--edge浏览器H5兼容设置-->
+		<meta http-equiv="X-UA-Compatible" content="IE=edge">
+		<!--360浏览器H5兼容设置-->
+		<meta name="renderer" content="webkit" />
+		<title>电脑商城</title>
+		<meta name="viewport" content="width=device-width, initial-scale=1">
+		<!--导入核心文件-->
+		<script src="../bootstrap3/js/holder.js"></script>
+		<link href="../bootstrap3/css/bootstrap.css" rel="stylesheet" type="text/css">
+		<script src="../bootstrap3/jquery-1.9.1.min.js"></script>
+		<script src="../bootstrap3/js/bootstrap.js"></script>
+		<!-- 字体图标 -->
+		<link rel="stylesheet" href="../bootstrap3/font-awesome-4.7.0/css/font-awesome.css" />
+		<link rel="stylesheet" type="text/css" href="../css/layout.css" />
+		<link rel="stylesheet" type="text/css" href="../css/top.css" />
+		<link rel="stylesheet" type="text/css" href="../css/footer.css" />
+		<link rel="stylesheet" type="text/css" href="../css/orderConfirm.css" />
+		<script type="text/javascript">
+			$(function () {
+				//引入公共头部、中间导航条以及页脚
+				$(".header").load("components/head.html")
+				$(".footer").load("components/footer.html")
+				$(".middleNavigation").load("components/middleNavigationBar.html")
+			})
+		</script>
+	</head>
+
+	<body>
+		<!--头部开始-->
+		<div class="header"></div>
+		<!--头部结束-->
+
+		<!--中间导航条开始 -->
+		<div class="middleNavigation"></div>
+		<!--中间导航条结束-->
+
+
+		<div class="container">
+			<div class="col-md-offset-1 col-md-10">
+				<div class="col-md-4">
+					<div class="col-md-12 order-bar-undo">
+						1.确认订单信息
+						<span class="pull-right"><span class="fa fa-chevron-right"></span></span>
+					</div>
+				</div>
+				<div class="col-md-4">
+					<div class="col-md-12 order-bar-undo">
+						2.在线支付
+						<span class="pull-right"><span class="fa fa-chevron-right"></span></span>
+					</div>
+				</div>
+				<div class="col-md-4">
+					<div class="col-md-12 order-bar-active">
+						3.付款成功
+					</div>
+				</div>
+				<div class="col-md-12">
+					<form role="form">
+						<div class="form-group">
+							<label for="name">
+								<p>支付结果：</p>
+							</label>
+							<div>订单号：1101000301，支付金额¥5298，收款方圆心电脑商城</div>
+							<hr/>
+							<div class="text-center pay-res">
+								<span class="fa fa-times-rectangle-o pay-res-icon"></span>支付失败
+							</div>
+							<div class="text-center">
+								圆心电脑商城不会以系统异常、订单升级为由，要求你点击任何链接进行退款操作
+							</div>
+							<div class="pay-bar">
+								<a href="index.html">返回</a>
+							</div>
+					</form>
+					</div>
+				</div>
+			</div></div>
+
+		<div class="clearfix"></div>
+		<!--页脚开始-->
+		<div class="footer"></div>
+		<!--页脚结束-->
+
+	</body>
+
+</html>

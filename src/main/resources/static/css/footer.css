@@ -1,0 +1,29 @@
+ /*图标加大 颜色*/
+ .rights .fa {
+ 	font-size: 30px;
+ 	color: #667799;
+ }
+ /*图片小间距*/
+ img {
+ 	margin: 1px;
+ }
+ /*超链接样式*/
+ .callus a {
+ 	font-size: 12px;
+ 	text-decoration: none;
+ 	color: #666666;
+ }
+ /*底部填充高*/
+ .bottom {
+ 	margin: 10px;
+ }
+ /*权益整行的颜色和填充*/
+ .rights {
+ 	width: 100%;
+ 	padding: 50px;
+ 	background-color: #F2F2F2;
+ }
+ /*联系我们那一整行的填充*/
+ .beforeBottom {
+ 	padding-top: 30px;
+ }

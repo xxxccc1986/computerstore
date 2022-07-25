@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="UTF-8">
+		<!--edge浏览器H5兼容设置-->
+		<meta http-equiv="X-UA-Compatible" content="IE=edge">
+		<!--360浏览器H5兼容设置-->
+		<meta name="renderer" content="webkit" />
+		<title>电脑商城</title>
+		<meta name="viewport" content="width=device-width, initial-scale=1">
+		<!--导入核心文件-->
+		<script src="../bootstrap3/js/holder.js"></script>
+		<link href="../bootstrap3/css/bootstrap.css" rel="stylesheet" type="text/css">
+		<script src="../bootstrap3/jquery-1.8.3.min.js"></script>
+		<script src="../bootstrap3/js/bootstrap.js"></script>
+		<!-- 字体图标 -->
+		<link rel="stylesheet" href="../bootstrap3/font-awesome-4.7.0/css/font-awesome.css" />
+		<link rel="stylesheet" type="text/css" href="../css/layout.css" />
+		<link rel="stylesheet" type="text/css" href="../css/webindex.css" />
+		<link rel="stylesheet" type="text/css" href="../css/footer.css" />
+		<link rel="stylesheet" type="text/css" href="../css/top.css" />
+
+	</head>
+
+	<script type="text/javascript">
+
+		$(function () {
+
+			//引入公共头部、中间导航条以及页脚
+			$(".header").load("components/head.html")
+			$(".footer").load("components/footer.html")
+			$(".middleNavigation").load("components/middleNavigationBar.html")
+
+			//在页面加载完成时发送ajax请求查询热销排行
+			showHotProducts();
+
+			//在页面加载完成时发送ajax请求查询最新产品
+			showNewProduct();
+
+		})
+
+		//携带id数据进行跳转
+		function jumpWithId(id){
+			//拼接跳转连接并带上需要查询的aid值
+			let url = "product.html?id=" + id;
+			location.href = url;
+		}
+
+		//查询热销商品的方法
+		function showHotProducts(){
+			$.ajax({
+				url : "/product/hotProduct",
+				type: "get",
+				dataType: "json",
+				success: function (res) {
+					for (let i = 0; i < res.data.length; i++) {
+						let str = "";
+						let product = res.data[i]
+						let image = ".." + product.image + "collect.png"
+						str = "<div class='col-md-12'>"
+								+ "<div class=\"col-md-7 text-row-2\">"
+								+ "<a href='javascript:void(0);'onclick='jumpWithId(#{id})'>" + product.title + "</a>"
+								+ "</div>"
+								+ "<div class=\"col-md-2\">￥" + product.price + "</div>"
+								+ "<div class=\"col-md-3\">"
+								+ "<img src=" + image  + " class='img-responsive' />"
+								+ "</div>"
+								+ "</div>"
+						str = str.replaceAll("#{id}",product.id)
+						$("#hot-list").append(str)
+					}
+				},
+				error: function () {
+					alert("查询错误，请等待攻城狮修复！！")
+				}
+			})
+		}
+		//展示新到商品
+		function showNewProduct() {
+			$.ajax({
+				url : "/product/newProduct",
+				type: "get",
+				dataType: "json",
+				success: function (res) {
+					for (let i = 0; i < res.data.length; i++) {
+						let str = "";
+						let product = res.data[i]
+						let image = ".." + product.image + "collect.png"
+						str = "<div class='col-md-12'>"
+								+ "<div class=\"col-md-7 text-row-2\">"
+								+ "<a href='javascript:void(0);'onclick='jumpWithId(#{id})'>" + product.title + "</a>"
+								+ "</div>"
+								+ "<div class=\"col-md-2\">￥" + product.price + "</div>"
+								+ "<div class=\"col-md-3\">"
+								+ "<img src=" + image  + " class='img-responsive' />"
+								+ "</div>"
+								+ "</div>"
+						str = str.replaceAll("#{id}",product.id)
+						$("#new-list").append(str)
+					}
+				},
+				error: function () {
+					alert("查询错误，请等待攻城狮修复！！")
+				}
+			})
+		}
+	</script>
+
+
+	<body>
+		<!--头部开始-->
+		<div class="header"></div>
+		<!--头部结束-->
+
+		<!--中间导航条开始 -->
+		<div class="middleNavigation"></div>
+		<!--中间导航条结束-->
+
+		<!--主体内容开始-->
+		<div class="container">
+			<div class="row">
+				<div class="col-md-12" style="padding: 20px;">
+					<div id="myCarousel" class="carousel slide">
+						<!-- 轮播（Carousel）指标 -->
+						<ol class="carousel-indicators">
+							<li data-target="#myCarousel" data-slide-to="0" class="active"></li>
+							<li data-target="#myCarousel" data-slide-to="1"></li>
+							<li data-target="#myCarousel" data-slide-to="2"></li>
+							<li data-target="#myCarousel" data-slide-to="3"></li>
+							<li data-target="#myCarousel" data-slide-to="4"></li>
+						</ol>
+						<!-- 轮播（Carousel）项目 -->
+						<div class="carousel-inner" align="center">
+							<div class="item active">
+								<img src="../images/index/index_banner1.png">
+							</div>
+							<div class="item">
+								<img src="../images/index/index_banner2.png">
+							</div>
+							<div class="item">
+								<img src="../images/index/index_banner3.png">
+							</div>
+							<div class="item">
+								<img src="../images/index/index_banner4.png">
+							</div>
+							<div class="item">
+								<img src="../images/index/index_banner5.png">
+							</div>
+						</div>
+						<!-- 轮播（Carousel）导航 -->
+						<a class="left carousel-control" href="#myCarousel" role="button" data-slide="prev">
+							<span class="glyphicon glyphicon-chevron-left" aria-hidden="true"></span>
+							<span class="sr-only">Previous</span>
+						</a>
+						<a class="right carousel-control" href="#myCarousel" role="button" data-slide="next">
+							<span class="glyphicon glyphicon-chevron-right" aria-hidden="true"></span>
+							<span class="sr-only">Next</span>
+						</a>
+					</div>
+				</div>
+			</div>
+
+			<!--推荐栏目-->
+			<div style="padding: 10px;" class="row">
+				<div class="col-md-6">
+					<div class="panel panel-default">
+						<div class="panel-heading">
+							<p class="panel-title">新到好货</p>
+						</div>
+						<div id="new-list" class="panel-body panel-item">
+							<!--待填充内容-->
+						</div>
+					</div>
+				</div>
+				<div class="col-md-6">
+					<div class="panel panel-default">
+						<div class="panel-heading">
+							<p class="panel-title">热销排行</p>
+						</div>
+						<div id="hot-list" class="panel-body panel-item">
+							<!--待填充内容-->
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+		<!--主体内容结束-->
+
+		<!--页脚开始-->
+		<div class="footer"></div>
+		<!--页脚结束-->
+
+	</body>
+
+</html>

@@ -1,0 +1,105 @@
+ <!--电脑商城logo-->
+    <div class="row">
+        <div class="col-md-3">
+            <a href="index.html">
+                <img src="../images/index/stumalllogo.png" />
+            </a>
+        </div>
+        <!--快捷选项-->
+        <div class="col-md-9 top-item">
+            <ul id="topMenu" class="list-inline pull-right">
+                <li><a href="favorites.html"><span class="fa fa-heart"></span>&nbsp;收藏</a></li>
+                <li class="li-split">|</li>
+                <li><a href="orders.html"><span class="fa fa-file-text"></span>&nbsp;订单</a></li>
+                <li class="li-split">|</li>
+                <li><a href="cart.html"><span class="fa fa-cart-plus"></span>&nbsp;购物车</a></li>
+                <li class="li-split">|</li>
+                <li>
+                    <!--下列列表按钮 ：管理-->
+                    <div class="btn-group">
+                        <button type="button" class="btn btn-link dropdown-toggle" data-toggle="dropdown">
+                            <span id="top-dropdown-btn"><span class="fa fa-gears"></span>&nbsp;管理 <span id="menuCaret" class="caret"></span></span>
+                        </button>
+                        <ul id="uiMenu" class="dropdown-menu top-dropdown-ul" role="menu">
+                            <li><a href="password.html">修改密码</a></li>
+                            <li><a href="userdata.html">个人资料</a></li>
+                            <li><a href="upload.html">上传头像</a></li>
+                            <li><a href="address.html">收货管理	</a></li>
+                        </ul>
+                    </div>
+                </li>
+                <li class="li-split">|</li>
+                <li><span class="fa fa-user"></span><a href="login.html" id="loginStatus" ></a></li>
+            </ul>
+        </div>
+    </div>
+
+ <script>
+     $(function () {
+         //必须随着页面加载先执行，不然有缓存界面会显示bug
+         //未登录状态下改变最上面的管理行
+         if (sessionStorage.getItem("user") === null){
+         //设置显示登录
+         $("#loginStatus").empty().html("&nbsp;&nbsp;" + "登录")
+         //移除管理模块的class样式并清空元素
+         $("#menuCaret").removeClass("caret")
+         $("#uiMenu").removeClass("dropdown-menu top-dropdown-ul").empty()
+         }else{ //不为空则已经登录
+             $.ajax({
+                 url : "/user/queryUser" ,
+                 type: "get",
+                 dataType: "json",
+                 success: function (res) {
+                     //用户登录了则改变最上面的导航条
+                     changeMenu(res)
+                 }
+             });
+         }
+
+     })
+
+     //登录状态下改变最上面的管理行
+     function changeMenu(res) {
+         let user = res.data;
+         //不为空代表已经登录
+         if (user.username != null){
+             //修改为登录的用户名
+             $("#loginStatus").html("&nbsp;" + user.username)
+             //添加退出按钮
+             let exitStr = "<li class=\"li-split\">|</li>"
+                 + "<li>"
+                 + "<span class=\"fa fa-sign-out\"></span>"
+                 + "<a href=\"javascript:void(0)\" onclick=\"exitLogin()\">&nbsp;退出</a>"
+                 + "</li>"
+             $("#topMenu").append(exitStr)
+
+             //移除跳转属性
+             document.getElementById("loginStatus").removeAttribute("href")
+         }
+     }
+
+     //退出功能
+     function exitLogin(){
+         if (sessionStorage.getItem("user") == null){
+             alert("尚未登录，请先登录！")
+         }else {
+             $.ajax({
+                 url: "/user/exit",
+                 type: "get",
+                 dataType: "json",
+                 success:function (res) {
+                     if (res.status === 200){
+                         alert("退出成功!")
+                         sessionStorage.removeItem("user")
+                         location.href = "index.html"
+                     }
+                 },
+                 error:function () {
+                     alert("服务器出现未知异常，退出登录失败")
+                 }
+             })
+
+         }
+     }
+
+ </script>

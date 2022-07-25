@@ -1,0 +1,65 @@
+/*商品大图片样式*/
+.img-big {
+	width: 100%;
+	display: none;
+	border: 2px solid #aaaaaa;
+	border-radius: 3px;
+	margin: 0;
+	padding: 0;
+}
+/*商品小图片的样式*/
+.img-small {
+	border: 1px solid #dddddd;
+	margin: 5px;
+	padding: 1px;
+	cursor: pointer;
+}
+/*大图片初始情况只显示一张，可见的样式*/
+.big-show {
+	display: block;
+}
+/*价格框的小字体样式*/
+.price-bar small {
+	font-size: 14px;
+}
+/*价格框的样式*/
+.price-bar {
+	background: #f0f9ff;
+	color: #092f97;
+	padding: 8px;
+	border: 3px solid #699fd7;
+	border-radius: 3px;
+	font-size: 30px;
+	margin: 5px;
+}
+/*购买表单的间隔*/
+.product-form {
+	margin: 10px 0;
+}
+/*表单行的间隔*/
+.form-space {
+	margin: 10px 0;
+}
+/*售后的图标*/
+.saled-icon {
+	color: #092F97;
+	font-size: 25px;
+}
+/*售后的标题*/
+.saled-title {
+	color: #092F97;
+	font-size: 18px;
+}
+/*售后的内容*/
+.saled-content {
+	color: #999999;
+	font-size: 12px;
+	padding-bottom: 40px;
+}
+/*数量按钮样式*/
+.num-btn {
+	width: 30px;
+}
+.num-text {
+	text-align: center;
+}

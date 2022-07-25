@@ -1,0 +1,315 @@
+<!DOCTYPE html>
+<html>
+
+	<head>
+		<meta charset="UTF-8">
+		<!--edge浏览器H5兼容设置-->
+		<meta http-equiv="X-UA-Compatible" content="IE=edge">
+		<!--360浏览器H5兼容设置-->
+		<meta name="renderer" content="webkit" />
+		<title>电脑商城</title>
+		<meta name="viewport" content="width=device-width, initial-scale=1">
+		<!--导入核心文件-->
+		<script src="../bootstrap3/js/holder.js"></script>
+		<link href="../bootstrap3/css/bootstrap.css" rel="stylesheet" type="text/css">
+		<script src="../bootstrap3/jquery-1.9.1.min.js"></script>
+		<script src="../bootstrap3/js/bootstrap.js"></script>
+		<!-- 字体图标 -->
+		<link rel="stylesheet" href="../bootstrap3/font-awesome-4.7.0/css/font-awesome.css" />
+		<link rel="stylesheet" type="text/css" href="../css/layout.css" />
+		<link rel="stylesheet" type="text/css" href="../css/top.css" />
+		<link rel="stylesheet" type="text/css" href="../css/footer.css" />
+
+		<script type="text/javascript">
+
+			$(function ()  {
+
+				//引入公共头部、中间导航条以及页脚
+				$(".header").load("components/head.html")
+				$(".footer").load("components/footer.html")
+				$(".middleNavigation").load("components/middleNavigationBar.html")
+
+				//页面加载完成时先把三个省市区的提示选择设置好
+				var provinceFirst = "<option value='0'>---- 选择省 ----</option>"
+				var cityFirst = "<option value='0' >---- 选择市 ----</option>"
+				var areaFirst = "<option value='0' >---- 选择区 ----</option>"
+				//插入提示选择项
+				$("#province-list").append(provinceFirst)
+				$("#city-list").append(cityFirst)
+				$("#area-list").append(areaFirst)
+
+				//记录省份查询的点击次数
+				let provinceCount = 0;
+				$("#province-list").click(function () {
+					provinceCount += 1;
+					let str = "";
+					if (provinceCount === 1){ //当count不等于1代表已经查询过了就不再做查询操作
+						$.ajax({
+							url : "/district/parent",
+							type: "get",
+							data:  "parent=86",
+							dataType: "json",
+							success: function (res) {
+								//成功之后将数据填充回下列列表当中
+								for (i= 0;i < res.data.length;i++){
+									//每一个district对象
+									let district = res.data[i]
+									str = "<option value=" + district.code +  ">"+ district.name + "</option>"
+									$("#province-list").append(str)
+								}
+							},
+							error: function () {
+								alert("查询省份列表出错，请等待攻城狮修复！！")
+							}
+						})
+					}
+				})
+				//监听省份选择以为城市选择做出变化
+				$("#province-list").change(function () {
+					//清空select下列列表中的所有option元素
+					$("#city-list").empty()
+					$("#area-list").empty()
+					// //追加默认值
+					$("#city-list").append(cityFirst)
+					$("#area-list").append(areaFirst)
+
+					//获取省份的选择是什么
+					let provinceChoose = $("#province-list").val()
+
+					//等于0表示没有选择省份，不发送ajax请求
+					if (provinceChoose === "0"){
+						return false
+					}
+
+						let str = "";
+						$.ajax({
+							url : "/district/parent",
+							type: "get",
+							data:  "parent=" + provinceChoose,
+							dataType: "json",
+							success: function (res) {
+								//成功之后将数据填充回下列列表当中
+								for (i= 0;i < res.data.length;i++){
+									//每一个district对象
+									let district = res.data[i]
+									str = "<option value=" + district.code +  ">"+ district.name + "</option>"
+									$("#city-list").append(str)
+								}
+							},
+							error: function () {
+								alert("查询城市列表出错，请等待攻城狮修复！！")
+							}
+						})
+
+				})
+
+				//监听城市选择以为区县的选择做出变化
+				$("#city-list").change(function () {
+					//获取城市的选择是什么
+					let cityChoose = $("#city-list").val()
+					//清空select下列列表中的所有option元素
+					$("#area-list").empty()
+					//追加默认值
+					$("#area-list").append(areaFirst)
+
+					if (cityChoose === "0"){
+						return false
+					}
+					let str = "";
+						$.ajax({
+							url : "/district/parent",
+							type: "get",
+							data:  "parent=" + cityChoose,
+							dataType: "json",
+							success: function (res) {
+								//成功之后将数据填充回下列列表当中
+								for (i= 0;i < res.data.length;i++){
+									//每一个district对象
+									let district = res.data[i]
+									str = "<option value=" + district.code +  ">"+ district.name + "</option>"
+									$("#area-list").append(str)
+								}
+							},
+							error: function () {
+								alert("查询区列表出错，请等待攻城狮修复！！")
+							}
+						})
+				})
+
+				//给添加按钮绑定单击事件
+				$("#btn-add-new-address").click(function () {
+					//判断手机号和收货人是否为空
+					let name = $("#name").val();
+					let phone = $("#phone").val();
+					if (phone == "" || name == ""){
+						$("#error-msg").html("请先填写需要修改的信息！");
+						return false;
+					}
+					//验证手机号是否符合要求
+					let checkPhone = /^[1][3,4,5,7,8][0-9]{9}$/;
+					if (!checkPhone.test(phone)){
+						$("#error-msg").html("手机号不符合要求！");
+						return false;
+					}
+					$.ajax({
+						url : "/address",
+						type: "post",
+						data: $("#form-add-new-address").serialize(), //获取表单的所有内容
+						dataType: "json",
+						success: function (res) {
+							if (res.status === 200){
+								alert("新增成功！")
+								location.href = "address.html"
+							}else {
+								alert(res.message)
+							}
+						},
+						error: function () {
+							alert("服务器出现故障，请等待攻城狮修复！！")
+						}
+					})
+				})
+			})
+		</script>
+	</head>
+
+	<body>
+		<!--头部开始-->
+		<div class="header"></div>
+		<!--头部结束-->
+
+
+		<!--中间导航条开始 -->
+		<div class="middleNavigation"></div>
+		<!--中间导航条结束-->
+
+		<div class="container">
+			<div class="col-md-2">
+				<!--左侧导航开始-->
+				<div class="panel-group" id="accordion">
+					<div class="panel panel-default">
+						<div class="panel-heading">
+							<!--主选项：我的订单-->
+							<p class="panel-title">
+								<a data-toggle="collapse" data-parent="#accordion" href="#collapseOne">我的订单</a>
+							</p>
+						</div>
+						<div id="collapseOne" class="panel-collapse collapse">
+							<div class="panel-body">
+								<div><a href="orders.html">全部订单</a></div>
+								<div><a href="orders.html">待付款</a></div>
+								<div><a href="orders.html">待收货</a></div>
+								<div><a href="orders.html">待评价</a></div>
+								<div><a href="orders.html">退货退款</a></div>
+							</div>
+						</div>
+					</div>
+					<div class="panel panel-default">
+						<div class="panel-heading">
+							<!--主选项：资料修改-->
+							<p class="panel-title">
+								<a data-toggle="collapse" data-parent="#accordion" href="#collapseTwo">资料修改</a>
+							</p>
+						</div>
+						<div id="collapseTwo" class="panel-collapse collapse in">
+							<div class="panel-body">
+								<div><a href="password.html">修改密码</a></div>
+								<div><a href="userdata.html">个人资料</a></div>
+								<div><a href="upload.html">上传头像</a></div>
+								<div><a href="address.html"><b>收货管理</b></a></div>
+							</div>
+						</div>
+					</div>
+				</div>
+				<!--左侧导航结束-->
+			</div>
+			<div class="col-md-10">
+				<div class="panel panel-default">
+					<ul class="nav nav-tabs">
+						<li><a href="password.html">修改密码</a></li>
+						<li><a href="userdata.html">个人资料</a></li>
+						<li><a href="upload.html">上传头像</a></li>
+						<li class="active"><a href="#">收货管理</a></li>
+					</ul>
+					<div class="panel-body">
+						<!--新增收货地址表单开始-->
+						<form id="form-add-new-address" class="form-horizontal" role="form" style="border:black">
+							<div class="form-group">
+								<label class="col-md-2 control-label"></label>
+								<label class="col-md-4 control-label" style="color: red;font-size: larger">新增地址</label>
+								<label class="col-md-2 control-label"></label>
+							</div>
+							<div class="form-group">
+								<label class="col-md-2 control-label"><span class="txtred">*</span>收货人：</label>
+								<div class="col-md-8">
+									<input id="name" name="name" type="text" class="form-control" placeholder="请输入收货人姓名">
+								</div>
+							</div>
+							<div class="address_content" data-toggle="distpicker">
+								<div class="form-group">
+									<label class="col-md-2 control-label"><span class="txtred">*</span>省/直辖市：</label>
+									<div class="col-md-3">
+										<select id="province-list" name="provinceCode" class="form-control" data-province="---- 选择省 ----"></select>
+									</div>
+									<label class="col-md-2 control-label"><span class="txtred">*</span>城市：</label>
+									<div class="col-md-3">
+										<select id="city-list" name="cityCode" class="form-control" data-city="---- 选择市 ----"></select>
+									</div>
+								</div>
+								<div class="form-group">
+									<label class="col-md-2 control-label"><span class="txtred">*</span>区县：</label>
+									<div class="col-md-3">
+										<select id="area-list" name="areaCode" class="form-control" data-district="---- 选择区 ----"></select>
+									</div>
+									<label class="col-md-2 control-label">邮政编码：</label>
+									<div class="col-md-3">
+										<input name="zip" type="text" class="form-control" placeholder="请输入邮政编码">
+									</div>
+								</div>
+							</div>
+							<div class="form-group">
+								<label class="col-md-2 control-label"><span class="txtred">*</span>详细地址：</label>
+								<div class="col-md-8">
+									<textarea name="address" class="form-control" rows="3" placeholder="输入详细的收货地址，小区名称、门牌号等"></textarea>
+								</div>
+							</div>
+							<div class="form-group">
+								<label class="col-md-2 control-label"><span class="txtred">*</span>手机：</label>
+								<div class="col-md-3">
+									<input id="phone" name="phone" type="text" class="form-control" placeholder="请输入手机号码">
+								</div>
+								<label class="col-md-2 control-label">固话：</label>
+								<div class="col-md-3">
+									<input name="tel" type="text" class="form-control" placeholder="请输入固定电话号码">
+								</div>
+							</div>
+							<div class="form-group">
+								<label class="col-md-2 control-label">地址类型：</label>
+								<div class="col-md-8">
+									<input name="tag" type="text" class="form-control" placeholder="请输入地址类型，如：家、公司或者学校">
+								</div>
+							</div>
+							<div class="form-group">
+								<label class="col-md-2 control-label"><a href="address.html">返回</a>&nbsp;&nbsp;&nbsp;</label>
+								<div class="col-sm-10">
+									<input id="btn-add-new-address" type="button" class="col-md-1 btn btn-primary" value="保存" />
+									<input type="reset" class="col-md-offset-1 col-md-1 btn btn-primary" value="重置" />
+									<div id="error-msg" class="pull-left" style="color: red;font-weight:bold;padding-left: 15px;padding-top: 5px" ></div>
+								</div>
+
+							</div>
+
+						</form>
+					</div>
+				</div>
+			</div>
+		</div>
+
+		<div class="clearfix"></div>
+		<!--页脚开始-->
+		<div class="footer"></div>
+		<!--页脚结束-->
+
+	</body>
+
+</html>

@@ -1,0 +1,19 @@
+/*商品列表图片的样式*/
+.img-search {}
+/*商品框的样式*/
+.goods-panel {
+	width: 100%;
+	border: 1px solid#eeeeee;
+	box-shadow: 0px 0px 0px #888888;
+	padding: 3px;
+	padding-bottom: 10px;
+	margin-bottom: 30px;
+}
+/*商品价格的样式*/
+.goods-panel h4 {
+	color: red;
+}
+/*商品名称的样式*/
+.goods-panel h5 {
+	height: 60px;
+}

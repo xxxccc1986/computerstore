@@ -1,0 +1,279 @@
+<!DOCTYPE html>
+<html>
+
+	<head>
+		<meta charset="UTF-8">
+		<!--edge浏览器H5兼容设置-->
+		<meta http-equiv="X-UA-Compatible" content="IE=edge">
+		<!--360浏览器H5兼容设置-->
+		<meta name="renderer" content="webkit" />
+		<title>电脑商城</title>
+		<meta name="viewport" content="width=device-width, initial-scale=1">
+		<!--导入核心文件-->
+		<script src="../bootstrap3/js/holder.js"></script>
+		<link href="../bootstrap3/css/bootstrap.css" rel="stylesheet" type="text/css">
+		<script src="../bootstrap3/jquery-1.9.1.min.js"></script>
+		<script src="../bootstrap3/js/bootstrap.js"></script>
+		<!-- 字体图标 -->
+		<link rel="stylesheet" href="../bootstrap3/font-awesome-4.7.0/css/font-awesome.css" />
+		<link rel="stylesheet" type="text/css" href="../css/layout.css" />
+		<link rel="stylesheet" type="text/css" href="../css/top.css" />
+		<link rel="stylesheet" type="text/css" href="../css/footer.css" />
+		<link rel="stylesheet" type="text/css" href="../css/order.css" />
+		<script src="../js/TimeTran.js" type="text/javascript" charset="UTF-8"></script>
+
+		<script type="text/javascript">
+			//展示订单详情
+			function showOrderDetails(oid){
+				location.href = "orderInfo.html?oid=" + oid
+			}
+
+			//确认收货的绑定事件
+			function makeOrderFinish(oid) {
+				if (confirm("您是否已经收到商品？如果是请继续执行收货操作！")){
+					let status = 3;
+					$.ajax({
+						url : "/order/updateStatus",
+						type: "post",
+						data: {oid:oid,status:status},
+						dataType: "json",
+						success: function (res) {
+							alert("收货成功！")
+						    location.reload();
+						},
+						error: function (error) {
+							alert("出现异常，收货失败！" + error.status)
+						}
+					});
+				}
+
+			}
+
+			//将返回的数据进行拼接并展示在页面上
+			function showInHtmlFromAjax(res) {
+				$("#orderDetail").empty();
+				//当用户是首次登录是没有任何订单的
+				if (res.data === null){
+					let nullStr = "<div class=\"panel panel-default\">"
+							+ "<div  class=\"panel-heading\">"
+							+  "<div style='padding-top: 5px;padding-bottom: 5px;font-weight: bolder;color: red'>"
+							+ "尚无订单，先去看看喜欢的东西吧！"
+							+ "<a href='index.html'  style='padding: 0 15px;'>点击此处跳转到首页！</a>"
+							+ "</div>"
+							+ "</div>"
+							+ "</div>"
+					$("#orderDetail").append(nullStr)
+
+					return false;
+				}
+				//记录返回订单数据的长度
+				let dataSize = res.data.length;
+				//记录上一个订单的id
+				let lastOrderId = 0;
+				let orderTopStr = "";
+				for (let i = 0; i < dataSize; i++) {
+					//获取当前遍历的数字
+					let idNum = i;
+					let orderVo = res.data[i]
+					//将时间格式变为年-月-日 时-分-秒
+					let orderTime = getDate(orderVo.orderTime);
+					//获取当前订单的状态
+					let status = JSON.parse(orderVo.status)
+					//获取当前订单的oid
+					let oid = orderVo.oid;
+
+					if (JSON.parse(orderVo.oid) === lastOrderId){
+						orderTopStr =  "<tr>"
+								+ "<td><img src=.." + orderVo.image + "collect.png" + " class=\"img-responsive\" /></td>"
+								+ "<td>" + orderVo.title + "</td>"
+								+ "<td>¥<span> " + orderVo.price + " </span></td>"
+								+ "<td>" + orderVo.num + "</td>"
+								+ "<td>¥<span> " + orderVo.price * orderVo.num + " </span></td>"
+								+ "<td><div id=status" + idNum + "></div></td>"
+								+ "</tr>"
+						//把这个tr元素加入到上一个订单的body框中
+						//因为此时的i == i-1，也就是说这个oid和上个oid相等，想加入上一个必须i-1才能找到对应的tbody
+						$(orderTopStr).appendTo($("#tbody"+(i-1)))
+						judgeStatus(status,idNum,oid)
+					}else{
+						//将当前的oid赋给这个变量进行保存
+						lastOrderId = orderVo.oid;
+						orderTopStr = "<div  class=\"panel panel-default\">"
+								+ "<div  class=\"panel-heading\">"
+								+ "<div style=\"padding-top: 5px;padding-bottom: 5px\">"
+								+ "订单号：" + orderVo.oid + ",下单时间：" + orderTime
+								+ "，收货人：" + orderVo.recvName
+								+ "<a href='aftersales.html' class='pull-right' style='padding: 0 15px;'>客服服务</a>"
+								+ "<a id=ensure" + idNum + " href='javascript:void(0)' onclick='makeOrderFinish(#{oid})' class=\" btn btn-default btn-xs pull-right\"></a>"
+								+ "</div>"
+								+ "<div class=\"panel-body\">"
+								+ "<table class=\"orders-table\" width=\"100%\">"
+								+ "<thead>"
+								+ "<tr>"
+								+ "<th width=\"15%\">商品简略图</th>"
+								+ "<th width=\"30%\">商品</th>"
+								+ "<th width=\"8%\">单价</th>"
+								+ "<th width=\"8%\">数量</th>"
+								+ "<th width=\"9%\">小计</th>"
+								+ "<th width=\"10%\">状态</th>"
+								+ "</tr>"
+								+ "</thead>"
+								+ "<tbody id=tbody" + idNum + " class=\"orders-body\">"
+								+ "<tr>"
+								+ "<td><img src=.." + orderVo.image + "collect.png" + " class=\"img-responsive\" /></td>"
+								+ "<td>" + orderVo.title + "</td>"
+								+ "<td>¥<span> " + orderVo.price + " </span></td>"
+								+ "<td>" + orderVo.num + "</td>"
+								+ "<td>¥<span> " + orderVo.price * orderVo.num + " </span></td>"
+								+ "<td><div id=status"+ idNum + "></div></td>"
+								+ "</tr>"
+								+ "</tbody>"
+								+ "</table>"
+								+ "<div>"
+								+ "<span id='orderPrice' style=\"color:red\" class=\"pull-right\">订单总金额：¥" + orderVo.totalPrice + " </span>"
+								+ "<div id=" + idNum +" >"
+								+ "<a class=\"pull-right\" href=\"javascript:void(0)\" onclick=\"showOrderDetails(#{showOid})\" style=\"padding: 0 15px;\">订单详情"
+								+ "</a>"
+								+ "</div>"
+								+ "</div>"
+								+ "</div>"
+								+ "</div>"
+						//使用正则表达式替换各个方法中的形参
+						orderTopStr = orderTopStr.replaceAll("#{oid}",orderVo.oid)
+						orderTopStr = orderTopStr.replaceAll("#{showOid}",orderVo.oid)
+						$("#orderDetail").append(orderTopStr)
+						//判断当前订单的状态
+						judgeStatus(status,idNum,oid);
+					}
+				}
+
+			}
+
+			//判断状态
+			function judgeStatus(status,idNum,oid){
+				if (status === -1){
+					$("#status"+idNum).html("已取消")
+				}else if (status === 0){
+					$("#status"+idNum).html("未付款")
+					//未付款的订单加入去支付的跳转连接
+					let str = "<a href='javascript:void(0)' "
+							+ "onclick='goToPay(#{goToPay})' "
+							+ "class=\"pull-right\">去付款</a>"
+					str = str.replaceAll("#{goToPay}",oid)
+					$("#" + idNum).append(str)
+				}else if (status === 1){
+					$("#status"+idNum).html("已付款")
+					//只有未发货的订单才能显示确定收货按钮
+					$("#ensure"+idNum).html("确定收货");
+				}else if (status === 2){
+					$("#status"+idNum).html("待收货")
+					//只有已发货的订单才能显示确定收货按钮
+					$("#ensure"+idNum).html("确定收货");
+				}else if (status === 3){
+					$("#status"+idNum).html("已收货")
+				}else if (status === 4){
+					$("#status"+idNum).html("已完成")
+				}
+			}
+
+			//让未付款的订单跳转到付款界面
+			function goToPay(oid){
+				let url = "payment.html?oid=" + oid
+				location.href = url;
+			}
+
+			//根据用户id和订单类型查询
+			function getUserOrderByUid(status){
+				$.ajax({
+					url : "/order/uidOrderVo",
+					type: "get",
+					data: "status=" + status,
+					dataType: "json",
+					success: function (res) {
+						showInHtmlFromAjax(res);
+					},
+					error: function (error) {
+						alert("查询订单列表失败！" + error.status)
+					}
+				});
+			}
+
+			//页面加载完成自动执行
+			$(function () {
+				//引入公共头部、中间导航条以及页脚
+				$(".header").load("components/head.html")
+				$(".footer").load("components/footer.html")
+				$(".middleNavigation").load("components/middleNavigationBar.html")
+
+				//查询用户订单
+				getUserOrderByUid("");
+
+			})
+		</script>
+	</head>
+
+	<body>
+		<!--头部开始-->
+		<div class="header"></div>
+		<!--头部结束-->
+
+		<!--中间导航条开始 -->
+		<div class="middleNavigation"></div>
+		<!--中间导航条结束-->
+
+		<div class="container">
+			<div class="col-md-2">
+				<!--左侧导航开始-->
+				<div class="panel-group" id="accordion">
+					<div class="panel panel-default">
+						<div class="panel-heading">
+							<!--主选项：我的订单-->
+							<p class="panel-title">
+								<a data-toggle="collapse" data-parent="#accordion" href="#collapseOne">我的订单</a>
+							</p>
+						</div>
+						<div id="collapseOne" class="panel-collapse collapse in">
+							<div class="panel-body">
+								<div><a href="javascript:void(0)" onclick="return getUserOrderByUid('')"><b>全部订单</b></a></div>
+								<div><a href="javascript:void(0)" onclick="return getUserOrderByUid(-1)">已取消</a></div>
+								<div><a href="javascript:void(0)" onclick="return getUserOrderByUid(0)">未付款</a></div>
+								<div><a href="javascript:void(0)" onclick="return getUserOrderByUid(1)">已付款</a></div>
+								<div><a href="javascript:void(0)" onclick="return getUserOrderByUid(2)">待收货</a></div>
+								<div><a href="javascript:void(0)" onclick="return getUserOrderByUid(3)">已收货</a></div>
+								<div><a href="javascript:void(0)" onclick="return getUserOrderByUid(4)">退货退款</a></div>
+							</div>
+						</div>
+					</div>
+					<div class="panel panel-default">
+						<div class="panel-heading">
+							<!--主选项：资料修改-->
+							<p class="panel-title">
+								<a data-toggle="collapse" data-parent="#accordion" href="#collapseTwo">资料修改</a>
+							</p>
+						</div>
+						<div id="collapseTwo" class="panel-collapse collapse">
+							<div class="panel-body">
+								<div><a href="password.html"><b>修改密码</b></a></div>
+								<div><a href="userdata.html">个人资料</a></div>
+								<div><a href="upload.html">上传头像</a></div>
+								<div><a href="address.html">收货管理</a></div>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+			<!--左侧导航结束-->
+			<div id="orderDetail" class="col-md-10">
+<!--		填充内容		-->
+
+			</div>
+		</div>
+
+		<div class="clearfix"></div>
+		<!--页脚开始-->
+		<div class="footer"></div>
+		<!--页脚结束-->
+
+	</body>
+
+</html>

@@ -1,0 +1,6 @@
+/*会变大的图片的默认样式*/
+.move-img {
+	background-size: 100%;
+	background-position: center;
+	background-repeat: no-repeat;
+}

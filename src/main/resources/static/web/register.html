@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="UTF-8">
+		<!--edge浏览器H5兼容设置-->
+		<meta http-equiv="X-UA-Compatible" content="IE=edge">
+		<!--360浏览器H5兼容设置-->
+		<meta name="renderer" content="webkit" />
+		<title>电脑商城</title>
+		<meta name="viewport" content="width=device-width, initial-scale=1">
+		<!--导入核心文件-->
+		<script src="../bootstrap3/js/holder.js"></script>
+		<link href="../bootstrap3/css/bootstrap.css" rel="stylesheet" type="text/css">
+		<script src="../bootstrap3/jquery-1.9.1.min.js"></script>
+		<script src="../bootstrap3/js/bootstrap.js"></script>
+		<!-- 字体图标 -->
+		<link rel="stylesheet" href="../bootstrap3/font-awesome-4.7.0/css/font-awesome.css" />
+		<link rel="stylesheet" type="text/css" href="../css/top.css" />
+		<link rel="stylesheet" type="text/css" href="../css/index.css" />
+		<link rel="stylesheet" type="text/css" href="../css/layout.css" />
+		<link rel="stylesheet" type="text/css" href="../css/reg.css" />
+		<link rel="stylesheet" type="text/css" href="../css/footer.css" />
+		<script src="../js/someFunction.js" type="text/javascript" charset="UTF-8"></script>
+
+		<!--	js代码	-->
+		<script type="text/javascript">
+			//在网页加载完成后执行
+			$(function () {
+				//引入页脚的公共页面
+				$(".footer").load("components/footer.html")
+
+				checkInfoAndSendAjax();
+
+				//给返回主页绑定点击事件
+				$("#btn-toIndex").click(function () {
+					location.href = "index.html"
+				})
+			})
+			//验证信息和发送ajax注册用户请求
+			function checkInfoAndSendAjax() {
+				//给用户注册绑定点击事件
+				$("#btn-reg").click(function () {
+					let name = $("#username").val();
+					let pwd = $("#password").val();
+					let rePwd = $("#rePwd").val();
+					let codeStr = $("#code").val();
+					//去掉验证码前后空格
+					codeStr = $.trim(codeStr);
+					if (name == "" || pwd == "" || rePwd == "" ||codeStr == ""){
+						$("#error-msg").text("请先填写需要注册的信息！");
+						return false;
+					}
+					//验证用户名是否符合规则
+					let nameCheck = /^\w{5,12}$/;
+					let username = $("#username").val();
+
+					if (!(nameCheck.test(username))){
+						$("#error-msg").text("用户名必须是5-12位的字母和数字");
+						return false;
+					}else {
+						$("#error-msg").empty()
+					}
+
+					//验证密码是否符合规则
+					let passCheck = /^\w{5,12}$/;
+					let password = $("#password").val();
+					if (!passCheck.test(password)){
+						$("#error-msg").text("密码必须是5-12位的字母和数字");
+						return false;
+					}else {
+						$("#error-msg").empty()
+					}
+
+					//验证确认密码和密码是否相同
+					let rePass = $("#rePwd").val();
+					if (rePass !== password){
+						$("#error-msg").text("密码不一致");
+						return false;
+					}else {
+						$("#error-msg").empty()
+					}
+
+					$.ajax({
+						url : "/user",
+						type: "post",
+						data: $("#form-reg").serialize(), //获取表单的所有内容
+						dataType: "json",
+						success: function (res) {
+							if (res.status === 200){
+								alert("注册成功！")
+								location.href = "login.html"
+							}else {
+								$("#error-msg").html(res.message)
+							}
+						},
+						error: function (error) {
+							alert(error.status + "错误,服务器出现故障，请等待攻城狮修复！！")
+						}
+					});
+				})
+			}
+
+		</script>
+
+	</head>
+	<body>
+		<!--头部-->
+		<header class="header">
+			<img src="../images/index/stumalllogo.png" alt="" />
+			<span class="pull-right"><small>欢迎访问</small><b>电脑商城</b></span>
+		</header>
+		<!--主体-->
+		<div class="container mycontent text-left" >
+			<!--透明层 -->
+			<div class="regDiv" style="height: 55%;">
+				<div id="error-msg"  style="color: red;font-weight:bold;padding-top: 10px"  class="pull-right">
+				</div>
+				<div style="padding-top: 10px;font-size: larger;padding-left: 10px" >新用户注册
+				</div>
+				<!--表单开始-->
+				<form style="padding-top: 10px" id="form-reg" class="form-horizontal" role="form" >
+					<!--用户名-->
+					<div class="form-group">
+						<label class="col-md-3 control-label">名字：</label>
+						<div class="col-md-8">
+							<input id="username" name="username" type="text" class="form-control" placeholder="请输入用户名">
+						</div>
+					</div>
+					<!--密码-->
+					<div class="form-group" >
+						<label class="col-md-3 control-label"> 密码：</label>
+						<div class="col-md-8">
+							<input id="password" name="password" type="password"  class="form-control" placeholder="请输入密码"/>
+						</div>
+						<img id="img" onclick="showPasswordOrNot('password','img')" src="../images/img/open.jpeg" style="width: 20px;padding-top: 5px;">
+					</div>
+					<!--确认密码-->
+					<div class="form-group">
+						<label class="col-md-3 control-label"> 确认密码：</label>
+						<div class="col-md-8">
+							<input id="rePwd" name="repwd" type="password"  class="form-control" placeholder="请再次输入密码">
+						</div>
+						<img id="rePwdImg" onclick="showPasswordOrNot('rePwd','rePwdImg')" src="../images/img/open.jpeg" style="width: 20px;padding-top: 5px;">
+					</div>
+					<div class="form-group">
+						<label class="col-md-3 control-label"> 验证码：</label>
+						<div class="col-md-4">
+							<input id="code" name="code" type="text" style="width: 120px;height: 45px" class="form-control" placeholder="请输入验证码"/>
+						</div>
+						<img id="kaptcha" src="/kaptcha/kaptcha-image" onclick="reFlashImg('kaptcha')" style="width: 140px;height: 45px;"/>
+					</div>
+
+					<!--提交按钮-->
+					<div class="form-group">
+						<label class="col-md-3 control-label"></label>
+						<div class="col-md-8">
+							<input id="btn-reg" class="btn btn-primary" type="button" value="立即注册" />
+							<input id="btn-toIndex" class="btn btn-primary" type="button" value="返回主页" />
+							<span class="pull-right"><small>已经有账号？</small><a href="login.html">登录</a></span>
+						</div>
+					</div>
+				</form>
+			</div>
+
+		</div>
+		<!--页脚开始-->
+		<div class="footer"></div>
+		<!--页脚结束-->
+	</body>
+
+</html>

@@ -1,0 +1,60 @@
+/*通用的去ul默认格式*/
+ul,li {
+	margin: 0;
+	padding: 0;
+	list-style: none;
+}
+body {
+	font-family: "微软雅黑", "黑体";
+}
+.txtred{
+	color: red;
+}
+.title-row-2 {
+	line-height: 1.2em;
+	height: 2.4em;
+	overflow: hidden;
+	display: -webkit-box;
+	-webkit-line-clamp: 2;
+	-webkit-box-orient: vertical;
+}
+.title-row-1 {
+	line-height: 1.2em;
+	height: 1.2em;
+	overflow: hidden;
+	display: -webkit-box;
+	-webkit-line-clamp: 1;
+	-webkit-box-orient: vertical;
+}
+.li-row-1 {
+	line-height: 1.2em;
+	height: 1.2em;
+	overflow: hidden;
+	display: -webkit-box;
+	-webkit-line-clamp: 1;
+	-webkit-box-orient: vertical;
+}
+.text-row-3 {
+	line-height: 1.2em;
+	height: 3.6em;
+	overflow: hidden;
+	display: -webkit-box;
+	-webkit-line-clamp: 3;
+	-webkit-box-orient: vertical;
+}
+.text-row-2 {
+	line-height: 1.2em;
+	height: 2.4em;
+	overflow: hidden;
+	display: -webkit-box;
+	-webkit-line-clamp: 2;
+	-webkit-box-orient: vertical;
+}
+.text-row-1 {
+	line-height: 1.2em;
+	height: 1.2em;
+	overflow: hidden;
+	display: -webkit-box;
+	-webkit-line-clamp: 1;
+	-webkit-box-orient: vertical;
+}

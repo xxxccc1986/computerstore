@@ -1,0 +1,94 @@
+/*轮换层大小*/
+#myCarousel {
+	width: 100%;
+}
+/*accordion是左侧导航条*/
+#accordion {
+	min-height: 300px;
+}
+/*左右两侧的阴影效果*/
+.carousel-control.left {
+	background-image: none;
+	background-color: #666666;
+	width: 40px;
+	height: 60px;
+	margin: 160px 0 0 20px;
+	border-radius: 5px;
+}
+.carousel-control.right {
+	background-image: none;
+	background-color: #666666;
+	width: 40px;
+	height: 60px;
+	margin: 160px 20px 0 0;
+	border-radius: 5px;
+}
+/*主页一级分类菜单 ul*/
+.index-menu {
+	width: 100%;
+	margin-left: 5%;
+	padding: 5px 0;
+	background-color: #4288c3;
+	color: #ffffff;
+	border-radius: 5px;
+}
+/*主页一级分类菜单项 li*/
+.index-menu li {
+	line-height: 18px;
+	height: 18px;
+	text-align: center;
+	cursor: pointer;
+}
+/*主页二级分类菜单 ul*/
+.second-menu {
+	background-color: #f5f5f5;
+	color: #4288c3;
+}
+/*主页二级分类菜单项 li*/
+.second-menu li {
+	cursor: pointer;
+	text-align: center;
+}
+/*主页三级分类菜单 ul*/
+.third-menu {
+	background-color: #f5f5f5;
+	color: #666666;
+}
+/*主页三级分类菜单项 li*/
+.third-menu li {
+	cursor: pointer;
+	text-align: center;
+}
+/*设置相对位置和绝对位置定位分类div*/
+#indexMenu {
+	position: static;
+}
+#showIndex {
+	position: absolute;
+	display: none;
+	min-width: 130px;
+	min-height: 50px;
+	background-color: #f5f5f5;
+	left: 195px;
+	top: 0;
+	z-index: 1;
+	border: 2px solid #4288c3;
+	border-left: none;
+}
+#showSecond {
+	position: absolute;
+	display: none;
+	min-width: 130px;
+	min-height: 50px;
+	background-color: #f5f5f5;
+	left: 323px;
+	top: 0;
+	z-index: 1;
+	border: 2px solid #4288c3;
+	border-left: none;
+}
+/*推荐栏目格式*/
+.panel-item>div {
+	padding: 2px 0;
+	border-bottom: 1px solid #f5f5f5;
+}

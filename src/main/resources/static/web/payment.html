@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html>
+
+	<head>
+		<meta charset="UTF-8">
+		<!--edge浏览器H5兼容设置-->
+		<meta http-equiv="X-UA-Compatible" content="IE=edge">
+		<!--360浏览器H5兼容设置-->
+		<meta name="renderer" content="webkit" />
+		<title>电脑商城</title>
+		<meta name="viewport" content="width=device-width, initial-scale=1">
+		<!--导入核心文件-->
+		<script src="../bootstrap3/js/holder.js"></script>
+		<link href="../bootstrap3/css/bootstrap.css" rel="stylesheet" type="text/css">
+		<script src="../bootstrap3/jquery-1.9.1.min.js"></script>
+		<script src="../bootstrap3/js/bootstrap.js"></script>
+		<!-- 字体图标 -->
+		<link rel="stylesheet" href="../bootstrap3/font-awesome-4.7.0/css/font-awesome.css" />
+		<link rel="stylesheet" type="text/css" href="../css/layout.css" />
+		<link rel="stylesheet" type="text/css" href="../css/top.css" />
+		<link rel="stylesheet" type="text/css" href="../css/footer.css" />
+		<link rel="stylesheet" type="text/css" href="../css/orderConfirm.css" />
+		<script src="../js/herf.js" type="text/javascript" charset="UTF-8"></script>
+
+		<script type="text/javascript">
+
+		function getOrderByOid(oid){
+			$.ajax({
+				url : "/order/queryOrder",
+				type: "get",
+				data: "oid=" + oid,
+				dataType: "json",
+				success: function (res) {
+					if (res.status === 200){
+						//修改订单号和支付金额
+						let order = res.data
+						$("#orderId").html(order.oid)
+						$("#orderPrice").html(order.totalPrice)
+						$("#rightPrice").html("¥" + order.totalPrice + "&nbsp;")
+						//给隐藏域的属性赋值
+						$("#oid").val(order.oid)
+						$("#totalPrice").val(order.totalPrice)
+					}else if (res.status === 3000){
+						location.href = "500.html"
+					}
+				},
+				error: function (error) {
+					if (error.status === 400 ){
+						location.href = "500.html"
+					}else {
+						alert("服务器出现故障，请等待攻城狮修复！！")
+					}
+				}
+			});
+		}
+
+		$(function () {
+			//引入公共头部、中间导航条以及页脚
+			$(".header").load("components/head.html")
+			$(".footer").load("components/footer.html")
+			$(".middleNavigation").load("components/middleNavigationBar.html")
+
+			//获取上个网页传来的参数
+			let oid = getPidFromLastHtml();
+
+			//自动发送ajax请求查询订单信息
+			getOrderByOid(oid);
+
+		})
+
+		function cancelOrder(oid){
+			if (confirm("确定要取消该订单码？")){
+				$.ajax({
+					url: "/order/updateStatus",
+					type: "post",
+					data: {oid:oid,status:-1},
+					success:function (res) {
+						alert("取消订单成功")
+						location.href = "orders.html"
+					}
+				})
+			}
+		}
+		</script>
+	</head>
+
+	<body>
+
+		<!--头部开始-->
+		<div class="header"></div>
+		<!--头部结束-->
+
+		<!--中间导航条开始 -->
+		<div class="middleNavigation"></div>
+		<!--中间导航条结束-->
+
+		<div class="container">
+			<div class="col-md-offset-1 col-md-10">
+				<div class="col-md-4">
+					<div class="col-md-12 order-bar-undo">
+						1.确认订单信息
+						<span class="pull-right"><span class="fa fa-chevron-right"></span></span>
+					</div>
+				</div>
+				<div class="col-md-4">
+					<div class="col-md-12 order-bar-active">
+						2.在线支付
+						<span class="pull-right"><span class="fa fa-chevron-right"></span></span>
+					</div>
+				</div>
+				<div class="col-md-4">
+					<div class="col-md-12 order-bar-undo">
+						3.付款成功
+					</div>
+				</div>
+				<div style="padding-top: 15px;padding-bottom: 15px"></div>
+				<p></p>
+				<div class="col-md-12" style="padding-top: 20px">
+					<form role="form" action="/alipay/pay">
+						<input id="oid" type="hidden" name="oid" value="">
+						<input id="totalPrice" type="hidden" name="totalPrice" value="">
+						<div>订单号：<span id="orderId"  style="color: red;font-weight: bold" ></span>&nbsp;，
+							支付金额¥&nbsp;<span id="orderPrice" style="color: red;font-weight: bold"></span>&nbsp;，收款方xx电脑商城</div>
+						<div class="pay-bar" style="padding-top: 30px">
+							<a href="cart.html" style="padding: 0 15px">返回购物车</a>
+							<a href="javascript:void(0)" onclick="return cancelOrder($('#oid').val())">取消支付</a>
+							<span class="pull-right">
+								<span id="rightPrice" style="color: red;font-weight: bold"></span>
+								<input type="submit" value="确认付款" class="btn btn-primary btn-lg link-success"/>
+							</span>
+						</div>
+					</form>
+				</div>
+			</div>
+		</div>
+
+
+		<div class="clearfix"></div>
+		<!--页脚开始-->
+		<div class="footer"></div>
+		<!--页脚结束-->
+
+	</body>
+
+</html>

@@ -1,0 +1,40 @@
+<div class="row top-nav">
+    <div class="col-md-4">
+        <ul class="nav nav-pills">
+            <li>
+                <a href="#"></a>
+            </li>
+            <li class="active"><a ><span class="fa fa-home"></span></a></li>
+            <li><a href="index.html">首页</a></li>
+            <li><a href="#">xxx</a></li>
+            <li><a href="#">xxx</a></li>
+            <li><a href="#">xxx</a></li>
+            <li><a href="#">xxx</a></li>
+        </ul>
+    </div>
+    <div class="col-md-8">
+        <form  id="searchForm"
+               onsubmit="return checkIfHaveVal()"
+               action= "/web/search.html"
+               class="form-inline pull-right"
+               role="form">
+            <div class="form-group" >
+                <input type="text" class="form-control" id="search" name="title" placeholder="请输入商品名称进行搜索">
+                <input type="hidden"  id="pageNum" name="pageNum" value="1">
+                <input type="hidden"  id="pageSize" name="pageSize" value="12">
+            </div>
+            <button id="toSearch" type="submit" class="btn btn-default btn-sm"><span class="fa fa-search"></span></button>
+        </form>
+    </div>
+</div>
+<script type="text/javascript">
+
+function checkIfHaveVal(){
+    let val = $("#search").val()
+    if (val === '') {
+        alert("请先输入搜索内容！")
+        return false;
+    }
+}
+</script>
+

@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="top.year21.computerstore.mapper.DistrictMapper">
+
+<!--   List<District> queryDistrictByParent(String parent); -->
+    <select id="queryDistrictByParent" resultType="district">
+        select * from t_dict_district where parent = #{parent} order by code ASC;
+    </select>
+
+<!--    String queryDistrictByCode(String code);-->
+    <select id="queryDistrictByCode" resultType="string">
+        select name from t_dict_district where code = #{code}
+    </select>
+</mapper>

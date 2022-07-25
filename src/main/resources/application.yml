@@ -1,0 +1,43 @@
+spring:
+  datasource:
+    type: com.zaxxer.hikari.HikariDataSource
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    url: jdbc:mysql://localhost:3306/computer_store?characterEncoding=utf8&useSSL=false&serverTimezone=UTC&rewriteBatchedStatements=true&allowPublicKeyRetrieval=true
+    username: root
+    password: root
+  #文件上传的相关设置
+  servlet:
+    multipart:
+      enabled: true #默认为true
+      max-file-size: 10MB #设置单个文件的上传大小
+      max-request-size: 30MB #设置上传文件的总大小
+
+#配置mybatis配置
+mybatis:
+  type-aliases-package: top.year21.computerstore.entity
+  mapper-locations: classpath:mybatis/mapper/*.xml
+  configuration:
+    #开启在mybatis处理过程中打印出对应的sql语句功能
+    log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
+    #开启数据库字段自动转换为驼峰命名
+    map-underscore-to-camel-case: true
+#配置分页插件
+#照着写就行，别问为什么
+pagehelper:
+  dialect: mysql
+  reasonable: true
+  support-methods-arguments: true
+  params: count=countSql
+
+server:
+  #本地项目的写法
+  port: 8080
+  ip；127.0.0.1
+#  部署服务器的写法
+#  ip: 服务器ip地址
+#  port: 8080
+#  filePath: /home/files/computer/
+
+
+
+

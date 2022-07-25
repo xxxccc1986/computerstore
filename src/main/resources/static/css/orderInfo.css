@@ -1,0 +1,15 @@
+/*状态条*/
+.state-bar {
+	background-color: #f3f3f3;
+	border: 2px solid #B9DEF0;
+	border-radius: 3px;
+}
+/*没完成的操作*/
+.order-flow {
+	font-size: 18px;
+	color: #aaaaaa;
+}
+/*完成的操作*/
+.order-success {
+	color: #2A6496;
+}

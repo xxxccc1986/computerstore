@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="UTF-8">
+		<!--edge浏览器H5兼容设置-->
+		<meta http-equiv="X-UA-Compatible" content="IE=edge">
+		<!--360浏览器H5兼容设置-->
+		<meta name="renderer" content="webkit" />
+		<title>电脑商城</title>
+		<meta name="viewport" content="width=device-width, initial-scale=1">
+		<!--导入核心文件-->
+		<script src="../bootstrap3/js/holder.js"></script>
+		<link href="../bootstrap3/css/bootstrap.css" rel="stylesheet" type="text/css">
+		<script src="../bootstrap3/jquery-1.9.1.min.js"></script>
+		<script src="../bootstrap3/js/bootstrap.js"></script>
+		<!-- 字体图标 -->
+		<link rel="stylesheet" href="../bootstrap3/font-awesome-4.7.0/css/font-awesome.css" />
+		<link rel="stylesheet" type="text/css" href="../css/top.css" />
+		<link rel="stylesheet" type="text/css" href="../css/index.css" />
+		<link rel="stylesheet" type="text/css" href="../css/layout.css" />
+		<link rel="stylesheet" type="text/css" href="../css/login.css" />
+		<link rel="stylesheet" type="text/css" href="../css/footer.css" />
+		<script src="../bootstrap3/js/jquery.cookie.js" type="text/javascript" charset="utf-8"></script>
+		<script src="../js/someFunction.js" type="text/javascript" charset="utf-8"></script>
+
+		<!--	js代码	-->
+		<script type="text/javascript">
+
+			//登录的方法
+			function login(){
+				//给用户注册绑定点击事件
+				$("#btn-login").click(function () {
+					if ($("#username").val() == "" || $("#password").val() == ""){
+						$("#error-msg").html("请先输入登录信息")
+						return false;
+					}
+					if ($("#code").val() == ""){
+						$("#error-msg").html("验证码不能为空")
+						return false;
+					}
+					//上面均没有问题则发送请求
+					$.ajax({
+						url : "/user",
+						type: "get",
+						data: $("#form-login").serialize(), //获取表单的所有内容
+						dataType: "json",
+						success: function (res) {
+							if (res.status === 200){
+								alert("登录成功！");
+								//前往首页
+								window.location.href="index.html";
+								//将用户信息存入session域中
+								sessionStorage.setItem("user",JSON.stringify(res.data));
+							}else {
+								$("#error-msg").html(res.message)
+							}
+						},
+						error: function (error) {
+							alert(error.status + "错误,服务器出现故障，请等待攻城狮修复！！")
+						}
+					});
+				})
+			}
+
+			//在网页加载完成后执行
+			$(function () {
+				//引入页脚
+				$(".footer").load("components/footer.html")
+
+				//登录功能
+				login();
+
+				//给返回主页绑定点击事件
+				$("#btn-toIndex").click(function () {
+					location.href = "index.html"
+				})
+
+			})
+		</script>
+
+	</head>
+	<body>
+		<!--头部-->
+		<header class="header">
+			<img src="../images/index/stumalllogo.png" alt="" />
+			<span class="pull-right"><small>欢迎访问</small><b>电脑商城</b></span>
+		</header>
+		<!--主体-->
+		<div class="container mycontent text-left">
+			<!--透明层 -->
+			<div class="loginDiv" style="height: 48%;">
+				<div id="error-msg"  style="color: red;font-weight:bold;padding-top: 10px"  class="pull-right">
+				</div>
+				<div style="padding-top: 10px;font-size: larger;padding-left: 10px" >用户登录
+				</div>
+				<!--表单开始-->
+				<form id="form-login" style="padding-top: 10px"  class="form-horizontal" role="form">
+					<!--用户名-->
+					<div class="form-group">
+						<label for="username" class="col-md-3 control-label">名字：</label>
+						<div class="col-md-8">
+							<input id="username" name="username" type="text" class="form-control"   placeholder="请输入用户名">
+						</div>
+					</div>
+					<!--密码-->
+					<div class="form-group">
+						<label for="password" class="col-md-3 control-label"> 密码：</label>
+						<div class="col-md-8">
+							<input id="password" name="password" type="password" class="form-control" id="password"  placeholder="请输入密码">
+						</div>
+						<img id="img" onclick="showPasswordOrNot('password','img')" src="../images/img/open.jpeg" style="width: 20px;padding-top: 4px;">
+					</div>
+					<div class="form-group">
+						<label class="col-md-3 control-label"> 验证码：</label>
+						<div class="col-md-4">
+							<input id="code" name="code" type="text" style="width: 120px;height: 40px" class="form-control" placeholder="请输入验证码"/>
+						</div>
+						<img id="loginKaptcha" src="/kaptcha/kaptcha-image" onclick="reFlashImg('loginKaptcha')" style="width: 140px;height: 45px;"/>
+					</div>
+					<!--提交按钮-->
+					<div class="form-group">
+						<label class="col-md-3 control-label"></label>
+						<div class="col-md-8">
+							<input id="btn-login" class="btn btn-primary" type="button" value="登录" />
+							<input id="btn-toIndex" class="btn btn-primary" type="button" value="返回主页" />
+							<span class="pull-right"><small>还没有账号？</small><a href="register.html">注册</a></span>
+						</div>
+					</div>
+				</form>
+			</div>
+		</div>
+		<!--页脚开始-->
+		<div class="footer"></div>
+		<!--页脚结束-->
+	</body>
+</html>

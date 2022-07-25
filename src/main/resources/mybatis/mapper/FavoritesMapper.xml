@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="top.year21.computerstore.mapper.FavoritesMapper">
+<!--   自定义结果集映射规则 同样字段可以不做设置-->
+    <resultMap id="queryFavorites" type="favorites">
+        <id column="fid" property="fid"/>
+        <result column="sell_point" property="sellPoint"/>
+    </resultMap>
+
+<!--    int addFavorites(Favorites favorites);-->
+    <insert id="addFavorites" parameterType="favorites" useGeneratedKeys="true" keyProperty="fid">
+        insert into t_favorites(uid,pid,image,price,title,sell_point,status)
+					values(#{uid},#{pid},#{image},#{price},#{title},#{sellPoint},#{status})
+    </insert>
+
+<!--    List<Favorites> queryFavoritesByUidAndStatus(Integer uid,Integer status);-->
+    <select id="queryFavoritesByUidAndStatus" resultMap="queryFavorites">
+        select * from t_favorites where uid= #{uid} and status =#{status}
+    </select>
+
+<!--    int updateFavoritesStatus(Integer status,Integer fid,Integer uid);-->
+    <update id="updateFavoritesStatus">
+        update t_favorites set status = #{status} where fid = #{fid} and uid = #{uid}
+    </update>
+</mapper>

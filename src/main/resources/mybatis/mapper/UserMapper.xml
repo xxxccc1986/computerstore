@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="top.year21.computerstore.mapper.UserMapper">
+    <!-- int addUser(@Param("user") User user); -->
+    <insert id="addUser" >
+        insert into t_user(
+                        username,password,salt,phone,email,gender,avatar,is_delete,
+                        created_user,created_time,modified_user,modified_time
+                        )
+                        values (
+                        #{username},#{password},#{salt},#{phone},#{email},
+                        #{gender},#{avatar},#{isDelete},
+                        #{createdUser},#{createdTime},#{modifiedUser},#{modifiedTime}
+                                )
+    </insert>
+
+
+    <!-- 询的结果集字段和实体类的user属性名不一致，自定义查询结果集的映射规则   -->
+    <resultMap id="queryUser" type="user">
+        <id property="uid" column="uid"/>
+        <result property="username" column="username"/>
+        <result property="password" column="password"/>
+        <result property="salt" column="salt"/>
+        <result property="phone" column="phone"/>
+        <result property="gender" column="gender"/>
+        <result property="avatar" column="avatar"/>
+        <result property="isDelete" column="is_delete"/>
+        <result property="createdUser" column="created_user"/>
+        <result property="createdTime" column="created_time"/>
+        <result property="modifiedUser" column="modified_user"/>
+        <result property="modifiedTime" column="modified_time"/>
+    </resultMap>
+
+    <!--   User queryUserByUsername(@Param("username") String username); -->
+    <!--  用于查询的结果集字段和实体类的user属性名不一致，所以不能使用resultType，必须使用resultMap  -->
+    <select id="queryUserByUsername" resultMap="queryUser">
+            select * from t_user  where username = #{username}
+    </select>
+
+    <!--    int updatePassword(@Param("password") String password,@Param("uid") String uid);-->
+    <update id="updatePassword">
+        update t_user set password = #{password},modified_user = #{modifiedUser},modified_time = #{modifiedTime}
+        where username = #{username};
+    </update>
+
+<!--    User queryUserByUid(@Param("uid") Integer uid);-->
+    <select id="queryUserByUid" resultMap="queryUser">
+        select * from t_user where uid = #{uid}
+    </select>
+
+<!--    int UpdateUserInfo(****)-->
+    <update id="UpdateUserInfo">
+        update t_user set
+                    <if test="phone != null and phone != ''">
+                         phone = #{phone},
+                    </if>
+                    <if test="email != null and email != ''">
+                        email = #{email},
+                    </if>
+                    <if test="gender != null ">
+                        gender = #{gender},
+                    </if>
+                          modified_user = #{modifiedUser},
+                          modified_time = #{modifiedTime}
+			  where uid = #{uid}
+    </update>
+
+<!--    int updateUserAvatar(@Param("file") String ImgAddress);-->
+    <update id="updateUserAvatar">
+        update t_user set avatar = #{file},
+                          modified_user = #{modifiedUser},
+                          modified_time = #{modifiedTime}
+                          where uid = #{uid};
+    </update>
+
+</mapper>

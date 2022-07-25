@@ -1,0 +1,336 @@
+<!DOCTYPE html>
+<html>
+
+	<head>
+		<meta charset="UTF-8">
+		<!--edge浏览器H5兼容设置-->
+		<meta http-equiv="X-UA-Compatible" content="IE=edge">
+		<!--360浏览器H5兼容设置-->
+		<meta name="renderer" content="webkit" />
+		<title>电脑商城</title>
+		<meta name="viewport" content="width=device-width, initial-scale=1">
+		<!--导入核心文件-->
+		<script src="../bootstrap3/js/holder.js"></script>
+		<link href="../bootstrap3/css/bootstrap.css" rel="stylesheet" type="text/css">
+		<script src="../bootstrap3/jquery-1.9.1.min.js"></script>
+		<script src="../bootstrap3/js/bootstrap.js"></script>
+		<!-- 字体图标 -->
+		<link rel="stylesheet" href="../bootstrap3/font-awesome-4.7.0/css/font-awesome.css" />
+		<link rel="stylesheet" type="text/css" href="../css/layout.css" />
+		<link rel="stylesheet" type="text/css" href="../css/top.css" />
+		<link rel="stylesheet" type="text/css" href="../css/footer.css" />
+		<link rel="stylesheet" type="text/css" href="../css/orderConfirm.css" />
+		<link rel="stylesheet" type="text/css" href="../css/cart.css" />
+		<script src="../js/herf.js" type="text/javascript" charset="UTF-8"></script>
+
+		<script type="text/javascript">
+			//获取地址栏上的url参数
+			var pid = getUrlParam("pid");
+			var num = getUrlParam("num");
+			var data;
+
+			//展示从商品详情页的跳转来的商品信息
+			function showOrderFromProductHtml() {
+				$.ajax({
+					url: "/product/" + pid,
+					type: "get",
+					dataType: "json",
+					success:function (res) {
+						let product = res.data;
+						let str = "";
+						let totalPrice = product.price * num;
+						str = "<tr>"
+								+ "<td id='pid' hidden='hidden'>" + pid + "</td>"
+								+ "<td><img src=.." + product.image + "collect.png" + " class='img-responsive' /></td>"
+								+ "<td>" + product.title + "</td>"
+								+ "<td>¥<span>" + product.price + "</span></td>"
+								+ "<td id=num>" + num + "</td>"
+								+ "<td><span>" + totalPrice + "</span></td>"
+								+ "</tr>"
+						$("#cart-list").append(str)
+						$("#all-count").empty().html(1)
+						$("#all-price").empty().html(totalPrice)
+					},
+					error:function () {
+						alert("购买失败！！")
+					}
+				})
+			}
+
+			//展示从购物车界面选中的商品信息
+			function showOrderItem(){
+				data = location.search.substr(1)//截取地址栏url?后的第二个元素，即购物车商品的cid
+				//记录商品总数和总价格
+				let totalNum = 0;
+				let countPrice = 0;
+				//自动发送ajax请求查询url地址上的cid信息
+				$.ajax({
+					url : "/cart/queryCids",
+					type: "get",
+					data: data,
+					dataType: "json",
+					success:function(res){
+						if (res.status === 200){
+							//填充信息
+							$("#cart-list").empty()
+							for (let i = 0; i < res.data.length; i++) {
+								let str = "";
+								let cartVo = res.data[i]
+								let totalPrice = cartVo.price * cartVo.num
+								str = "<tr>"
+										+ "<td id=cid" + i + " hidden='hidden'>" + cartVo.cid + "</td>"
+										+ "<td><img src=.." + cartVo.image + "collect.png" + " class='img-responsive' /></td>"
+										+ "<td>" + cartVo.title + "</td>"
+										+ "<td>¥<span>" + cartVo.price + "</span></td>"
+										+ "<td id=num" + i +  " >" + cartVo.num + "</td>"
+										+ "<td><span>" + totalPrice + "</span></td>"
+										+ "</tr>"
+								$("#cart-list").append(str)
+								//计算商品的数量和总金额
+								totalNum = totalNum + cartVo.num
+								countPrice = countPrice + totalPrice;
+							}
+							$("#all-count").empty().html(totalNum)
+							$("#all-price").empty().html(countPrice)
+						}else{
+							location.href = "500.html"
+						}
+						},
+					error: function () {
+						location.href = "500.html"
+					}
+				})
+
+			}
+
+			//查询用户地址并展示
+			function queryAddress(){
+				$.ajax({
+					url: "/address",
+					type: "get",
+					success:function (res) {
+						//表示用户已经添加了收货地址
+						if (res.data.length !== 0){
+							$("#address-list").empty()
+							for (let i = 0; i < res.data.length; i++) {
+								let address = res.data[i]
+								let str = ""
+								str = "<option value=" + address.aid + ">"
+										+ address.name + "&nbsp;&nbsp;&nbsp;"
+										+ address.tag + "&nbsp;&nbsp;&nbsp;"
+										+ address.provinceName + address.cityName + address.areaName + address.address
+										+ "&nbsp;&nbsp;&nbsp;" + address.phone
+										+ "</option>"
+								$("#address-list").append(str)
+							}
+						}else {
+							if (confirm("尚未添加收货地址，请先通过收货管理添加收货地址！！")){
+								location.href = "address.html"
+							}
+							let str = "<option>" + "暂未添加收货地址，请先通过收货管理添加收货地址" + "</option>"
+							$("#address-list").empty().append(str).attr("disabled","disabled")
+						}
+
+					}
+				})
+			}
+
+			//获取用户选择的是哪一个地址的value值
+			function getSelectOption(){
+				//定位到要查询指定id的元素
+				let element = window.document.getElementById("address-list");
+				//选中索引
+				let index = element.selectedIndex;
+				//获取选中的option的值
+				return element.options[index].value;
+			}
+
+			//表示这是从商品界面进入的确认订单界面
+			function fromProductSentAjaxCreateOrderItem(oid){
+				$.ajax({
+					url: "/order/createOrderItem",
+					type: "post",
+					data: {oid:oid,pid:pid,num:num},
+					dataType: "json",
+					success:function (res) {
+						if (res.status === 200){
+							//跳转到指定页面
+							location.href = "payment.html?oid=" + oid
+						}else {
+							alert("创建orderItem订单失败")
+						}
+					},
+					error: function (error){
+						alert("服务器内部异常！")
+					}
+				})
+			}
+
+			//获取每个cid取创建orderItem数据
+			function useCidSentAjaxCreateOrderItem(oid){
+				//获取用户选中了几个商品
+				let size = $("#cart-list").children("tr").length
+				//遍历获取每个商品的pid值
+				for (let i = 0; i < size; i++) {
+					let cid = JSON.parse($("#cid"+ i).html())
+					let num = JSON.parse($("#num"+ i).html())
+					$.ajax({
+						url: "/order/createOrderItem",
+						type: "post",
+						data: {cid:cid,oid:oid,num:num},
+						dataType: "json",
+						success:function (res) {
+							if (res.status === 200){
+								//跳转到指定页面
+								location.href = "payment.html?oid=" + oid
+							}else {
+								alert("创建orderItem订单失败")
+							}
+						},
+						error: function (error){
+							alert("服务器内部异常！")
+						}
+
+					})
+				}
+			}
+
+			//页面加载完成时自动发送
+			$(function () {
+
+				//引入公共头部、中间导航条以及页脚
+				$(".header").load("components/head.html")
+				$(".footer").load("components/footer.html")
+				$(".middleNavigation").load("components/middleNavigationBar.html")
+
+				//页面加载完成自动发送请求查询用户地址并填充数据
+				queryAddress();
+
+				if (pid !== null && num !== null){ //两者都不为null表示从商品界面进入
+					//查询从商品界面选中的商品信息
+					showOrderFromProductHtml();
+				}else { //否则就是从购物车页面进入
+					//查询购物车商品信息
+					showOrderItem();
+				}
+
+				//给在线支付按钮绑定单击事件
+				$("#btn-create-order").click(function() {
+
+					//获取用户选择的是哪一个地址的value值
+					let aid = getSelectOption();
+					let totalPrice = JSON.parse($("#all-price").html());
+					$.ajax({
+						url: "/order/createOrder",
+						type: "post",
+						data: {aid:aid,totalPrice:totalPrice},
+						dataType: "json",
+						success:function (res) {
+							//获取已经创建的order的订单号
+							let oid = res.data.oid
+							//获取地址栏上的参数
+							let urlParam = location.search.substr(1)//截取地址栏url?后的第二个元素
+							//判断是否携带了cids，不等于-1代表是从购物车进入这个界面
+							if(urlParam.search("cids") !== -1){
+								//获取每个cid取创建orderItem数据
+								useCidSentAjaxCreateOrderItem(oid);
+							}else{ //等于1代表不是从购物车进入这个界面
+								//实现商品界面的立即购买创建订单
+								fromProductSentAjaxCreateOrderItem(oid);
+							}
+						},
+						error: function (error){
+							alert(error.message)
+						}
+					})
+				})
+
+			})
+
+		</script>
+	</head>
+
+	<body>
+		<!--头部开始-->
+		<div class="header"></div>
+		<!--头部结束-->
+
+		<!--中间导航条开始 -->
+		<div class="middleNavigation"></div>
+		<!--中间导航条结束-->
+
+		<div class="container">
+			<div class="col-md-offset-1 col-md-10">
+				<div class="col-md-4">
+					<div class="col-md-12 order-bar-active">
+						1.确认订单信息
+						<span class="pull-right"><span class="fa fa-chevron-right"></span></span>
+					</div>
+				</div>
+				<div class="col-md-4">
+					<div class="col-md-12 order-bar-undo">
+						2.在线支付
+						<span class="pull-right"><span class="fa fa-chevron-right"></span></span>
+					</div>
+				</div>
+				<div class="col-md-4">
+					<div class="col-md-12 order-bar-undo">
+						3.付款成功
+					</div>
+				</div>
+				<div class="col-md-12">
+					<form id="form-create-order" role="form">
+						<div class="form-group">
+							<label for="name">
+								<p>选择收货地址：</p>
+							</label>
+							<select name="aid" id="address-list" class="form-control">
+							<!--待填充内容-->
+							</select>
+						</div>
+						<div class="panel panel-primary">
+							<div class="panel-heading">
+								<p class="panel-title">订单商品信息：</p>
+							</div>
+							<div class="panel-body">
+								<table class="cart-table" width="100%">
+									<thead>
+										<tr>
+											<th width="15%">商品图</th>
+											<th width="35%">商品</th>
+											<th width="15%">单价</th>
+											<th width="15%">数量</th>
+											<th width="20%">金额</th>
+										</tr>
+									</thead>
+									<tbody id="cart-list" class="cart-body">
+										<!--待填充内容-->
+									</tbody>
+								</table>
+								<div class="total-bar">
+									&nbsp;
+									<span class="pull-right">已选商品
+										<span id="all-count" style="color: red">0</span>&nbsp;件 总价¥
+										<span id="all-price" style="color: red">0</span>&nbsp;元
+									</span>
+								</div>
+							</div>
+						</div>
+						<div class="pay-bar">
+							<a href="cart.html">返回购物车</a>
+							<span class="pull-right"><input id="btn-create-order" type="button" value="在线支付" class="btn btn-primary btn-lg link-pay"/></span>
+						</div>
+					</form>
+				</div>
+			</div>
+		</div>
+
+
+		<div class="clearfix"></div>
+		<!--页脚开始-->
+		<div class="footer"></div>
+		<!--页脚结束-->
+
+	</body>
+
+</html>

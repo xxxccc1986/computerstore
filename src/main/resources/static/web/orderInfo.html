@@ -1,0 +1,242 @@
+<!DOCTYPE html>
+<html>
+
+	<head>
+		<meta charset="UTF-8">
+		<!--edge浏览器H5兼容设置-->
+		<meta http-equiv="X-UA-Compatible" content="IE=edge">
+		<!--360浏览器H5兼容设置-->
+		<meta name="renderer" content="webkit" />
+		<title>电脑商城</title>
+		<meta name="viewport" content="width=device-width, initial-scale=1">
+		<!--导入核心文件-->
+		<script src="../bootstrap3/js/holder.js"></script>
+		<link href="../bootstrap3/css/bootstrap.css" rel="stylesheet" type="text/css">
+		<script src="../bootstrap3/jquery-1.9.1.min.js"></script>
+		<script src="../bootstrap3/js/bootstrap.js"></script>
+		<!-- 字体图标 -->
+		<link rel="stylesheet" href="../bootstrap3/font-awesome-4.7.0/css/font-awesome.css" />
+		<link rel="stylesheet" type="text/css" href="../css/layout.css" />
+		<link rel="stylesheet" type="text/css" href="../css/top.css" />
+		<link rel="stylesheet" type="text/css" href="../css/footer.css" />
+		<link rel="stylesheet" type="text/css" href="../css/orderInfo.css" />
+		<link rel="stylesheet" type="text/css" href="../css/order.css" />
+		<script src="../js/herf.js" type="text/javascript" charset="UTF-8"></script>
+		<script src="../js/TimeTran.js" type="text/javascript" charset="UTF-8"></script>
+
+		<script type="text/javascript">
+
+			//在原时间基础上添加几天
+			function addDate(oldDate,days){
+				//根据传进的日期创建date对象
+				let newDate = new Date(oldDate);
+				//获得日期的当前日时间
+				let today = newDate.getDate();
+				//进行时间累加
+				newDate = newDate.setDate(today + days)
+				//返回变化后的时间
+				return newDate;
+			}
+
+			//查询订单信息
+			function showOrder(oid) {
+				$.ajax({
+					url : "/order/queryOrderVo",
+					type: "get",
+					data: "oid=" + oid,
+					dataType: "json",
+					success: function (res) {
+						let tempOrder = res.data[0]
+						//转换时间
+						let order = getDate(tempOrder.orderTime);
+						let pay = getDate(tempOrder.payTime);
+						//构建虚拟的发货时间
+						let sendTime = addDate(tempOrder.orderTime,1);
+						let send = getDate(sendTime);
+						//构建虚拟的收货时间
+						let ensureTime = addDate(tempOrder.orderTime,3);
+						let ensure = getDate(ensureTime);
+
+						//修改状态信息
+						$("#orderVoId").html(tempOrder.oid)
+
+						let orderStatus = JSON.parse(tempOrder.status);
+						//根据订单状态修改状态描述信息
+						if (orderStatus === -1){
+							$("#orderStatus").html("已取消")
+							//删除对应的样式
+							$("li").removeClass("order-success")
+							$("span").removeClass("fa fa-check-circle")
+							$("#tranInfo").empty().html("<p style='font-size: larger' >无<p>")
+						}else if(orderStatus === 0){
+							$("#orderStatus").html("未付款")
+							//删除对应的样式
+							$("li").removeClass("order-success")
+							$("span").removeClass("fa fa-check-circle")
+							$("#tranInfo").empty().html("<p style='font-size: larger' >无<p>")
+						}else if (orderStatus === 1){
+							$("#orderStatus").html("已付款")
+							$("#orderTime").html(order)
+							$("#payTime").html(pay)
+							//删除商场发货的样式
+							$(".order-flow").children("li:eq(2)").removeClass("order-success")
+							$(".order-flow").find("li:eq(2)").children("span").removeClass("fa fa-check-circle")
+							//删除物流信息
+							$("#tranInfo").empty().html("<p style='font-size: larger' >无<p>")
+						}else if (orderStatus === 2){
+							$("#orderStatus").html("待收货")
+							$("#orderTime").html(order)
+							$("#payTime").html(pay)
+							$("#sentTime").html(send)
+						}else if (orderStatus === 3){
+							$("#orderStatus").html("已收货")
+							$("#orderTime").html(order)
+							$("#payTime").html(pay)
+							$("#sentTime").html(send)
+							//激活用户收货的css样式和添加虚拟的收货时间
+							$("#ensureTime").html(ensure)
+							$(".order-flow").children("li:eq(3)").addClass("order-success")
+							$(".order-flow").find("li:eq(3)").append("<span class=\"fa fa-check-circle\"></span>")
+						}else if (orderStatus === 4){
+							$("#orderStatus").html("已完成")
+						}
+						//修改地址详情
+						$("#recvName").html(tempOrder.recvName)
+						$("#zip").html(tempOrder.zip)
+						$("#phone").html(tempOrder.phone)
+						$("#address").html(tempOrder.provinceName + tempOrder.cityName
+											+ tempOrder.areaName + tempOrder.address)
+						//修改商品详情
+						$("#orderVoId2").html(tempOrder.oid)
+						$("#orderTime2").html(order)
+						$("#recvName2").html(tempOrder.recvName)
+						for (let i = 0; i < res.data.length; i++) {
+							let str = "";
+							let orderVo = res.data[i]
+							str = "<tr>"
+									+ "<td><img src=.." + orderVo.image + "collect.png" + " class=\"img-responsive\" /></td>"
+									+ "<td>" + orderVo.title + "</td>"
+									+ "<td>¥<span>" + orderVo.price + "</span></td>"
+									+ "<td>" + orderVo.num +"</td>"
+									+ "<td>¥<span>" + orderVo.price * orderVo.num + "</span></td>"
+									+ "</tr>"
+							//将每个商品逐个插入到表格中
+							$(".orders-body").append(str)
+						}
+						//改变订单总金额
+						$("#totalPrice").html(tempOrder.totalPrice)
+					},
+					error: function (error) {
+						alert("服务器出现故障，请等待攻城狮修复！！")
+					}
+				});
+			}
+
+
+			$(function () {
+				//引入公共头部、中间导航条以及页脚
+				$(".header").load("components/head.html")
+				$(".footer").load("components/footer.html")
+				$(".middleNavigation").load("components/middleNavigationBar.html")
+				//获取从上个页面传来的oid参数
+				let oid = getPidFromLastHtml();
+
+				//自动发送ajax请求查询订单信息
+				showOrder(oid);
+			})
+
+
+		</script>
+	</head>
+
+	<body>
+		<!--头部开始-->
+		<div class="header"></div>
+		<!--头部结束-->
+
+		<!--中间导航条开始 -->
+		<div class="middleNavigation"></div>
+		<!--中间导航条结束-->
+
+		<!--页面主体开始-->
+		<div class="container">
+			<div class="col-md-offset-1 col-md-10">
+				<h1>订单详情：</h1>
+				<h2 class="page-header">状态信息：</h2>
+				<div class="state-bar">
+					订单号：<span id="orderVoId"></span> ，
+					当前状态：
+					<span id="orderStatus"></span>
+				</div>
+				<ol class="order-flow">
+					<li class="order-success">1.提交订单 <small id="orderTime"></small> <span class="fa fa-check-circle"></span></li>
+					<li class="order-success">2.付款成功 <small id="payTime"></small> <span class="fa fa-check-circle"></span></li>
+					<li class="order-success">3.商城发货 <small id="sentTime"></small> <span class="fa fa-check-circle"></span></li>
+					<li>4.用户收货 <small id="ensureTime"></small> </li>
+					<li>5.购物评价</li>
+				</ol>
+				<h2 class="page-header">地址详情：</h2>
+				<p>收货人姓名：<span id="recvName"></span>，
+					邮政编码：<span id="zip"></span>，
+					联系电话： <span id="phone"></span>
+				</p>
+				<p>收货地址：
+					<span id="address">
+
+					</span>
+				</p>
+				<h2 class="page-header">物流信息：</h2>
+				<div id="tranInfo">
+					<p>发货时间：2022-07-23 14:09</p>
+					<p>物流公司：顺丰快递</p>
+					<p>快递单号：301111303203048</p>
+					<p>物流信息：</p>
+					<p>2022-07-24 18:09:30 您的快递在【xx国贸分拣中心】准备装车</p>
+					<p>2022-07-25 08:39:50 您的快递在【xx转运中心】分拣完毕</p>
+					<p>2022-07-25 23:18:07 您的快递到达【xx派发中心】</p>
+				</div>
+
+				<h2 class="page-header">商品详情：</h2>
+				<div class="panel panel-default">
+					<div class="panel-heading">
+						<h3 class="panel-title">
+               			订单号：<span id="orderVoId2"></span>，
+						下单时间：<span id="orderTime2"></span> ，
+						收货人：<span id="recvName2"></span>
+            		</h3>
+					</div>
+					<div class="panel-body">
+						<table class="orders-table">
+							<thead>
+								<tr>
+									<th width="15%"></th>
+									<th width="35%">商品</th>
+									<th width="15%">单价</th>
+									<th width="15%">数量</th>
+									<th width="20%">小计</th>
+								</tr>
+							</thead>
+							<tbody class="orders-body">
+							<!--待填充内容-->
+
+							</tbody>
+						</table>
+						<div>
+							<span class="pull-right">订单总金额：¥<span id="totalPrice"></span></span>
+						</div>
+					</div>
+				</div>
+				<a href="orders.html">返回</a>
+			</div>
+		</div>
+
+
+
+		<div class="clearfix"></div>
+		<!--页脚开始-->
+		<div class="footer"></div>
+		<!--页脚结束-->
+
+	</body>
+
+</html>

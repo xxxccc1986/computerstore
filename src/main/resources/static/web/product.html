@@ -1,0 +1,282 @@
+<!DOCTYPE html>
+<html>
+
+	<head>
+		<meta charset="UTF-8">
+		<!--edge浏览器H5兼容设置-->
+		<meta http-equiv="X-UA-Compatible" content="IE=edge">
+		<!--360浏览器H5兼容设置-->
+		<meta name="renderer" content="webkit" />
+		<title>电脑商城</title>
+		<meta name="viewport" content="width=device-width, initial-scale=1">
+		<!--导入核心文件-->
+		<script src="../bootstrap3/js/holder.js"></script>
+		<link href="../bootstrap3/css/bootstrap.css" rel="stylesheet" type="text/css">
+		<script src="../bootstrap3/jquery-1.9.1.min.js"></script>
+		<script src="../bootstrap3/js/bootstrap.js"></script>
+		<!-- 字体图标 -->
+		<link rel="stylesheet" href="../bootstrap3/font-awesome-4.7.0/css/font-awesome.css" />
+		<link rel="stylesheet" type="text/css" href="../css/layout.css" />
+		<link rel="stylesheet" type="text/css" href="../css/top.css" />
+		<link rel="stylesheet" type="text/css" href="../css/footer.css" />
+		<link rel="stylesheet" type="text/css" href="../css/product.css" />
+		<link rel="stylesheet" type="text/css" href="../css/imgmove.css" />
+		<script src="../js/product.js" type="text/javascript" charset="utf-8"></script>
+		<script src="../js/imgmove.js" type="text/javascript" charset="utf-8"></script>
+		<script src="../js/herf.js" type="text/javascript" charset="UTF-8"></script>
+		<script src="../js/someFunction.js" type="text/javascript" charset="UTF-8"></script>
+		<script type="text/javascript">
+			//接收上一个页面传来的连接
+			var pid = getOne();
+
+			function showInThisProductHtml(){
+				//判断是否携带参数
+				if (location.search.substring(1).indexOf("id") === -1){
+					location.href = "500.html"
+					return false;
+				}
+
+				//在页面加载完成时自动发送此ajax请求并填充表单
+				$.ajax({
+					url: "/product/" + pid,
+					type: "get",
+					dataType: "json",
+					success:function (res) {
+						let product = res.data;
+						//将普通的数据填充至页面
+						$("#product-title").text(product.title)
+						$("#product-sell-point").append(product.sellPoint)
+						$("#product-price").text(product.price)
+						$("#stock").text(product.num)
+						//将数据库查询的图片进行替换
+						let image = ".." +  product.image
+						//遍历填充图片数据
+						for (let i = 1; i <= 5; i++) {
+							$("#product-image-" + i + "-big").attr("src",image + i + "_big.png")
+							$("#product-image-" + i).attr("src",image + i + ".jpg")
+						}
+					}
+				})
+			}
+
+			//将商品加入购物车
+			function addProductToCart(){
+				$(".go-cart").click(function () {
+					//判断是否登录
+					if (sessionStorage.getItem("user") == null){
+						alert("您尚未登录，请先登录！")
+						location.href = "login.html"
+						return false;
+					}
+
+					if (confirm("确定要将此商品加入购物车吗？")){
+						let price = $("#product-price").text()
+						let num = $("#num").val()
+						$.ajax({
+							url: "/cart/addCart",
+							type: "post",
+							data: {pid:pid,price:price,num:num},
+							dataType: "json",
+							success: function (res) {
+								alert("已成功加入购物车，在购物车等您结算哟！")
+							},
+							error : function (err) {
+								alert("服务器出现错误，加入购物车失败！")
+							}
+						})
+					}
+				})
+
+			}
+
+
+			$(function () {
+				//引入公共头部、中间导航条以及页脚
+				$(".header").load("components/head.html")
+				$(".footer").load("components/footer.html")
+				$(".middleNavigation").load("components/middleNavigationBar.html")
+
+				//在页面加载完成时，填充页面数据
+				showInThisProductHtml();
+
+				//激活加入购物车功能
+				addProductToCart();
+
+				//给立即购买按钮绑定点击事件
+				$("#buyRightNow").click(function () {
+					let pid = getOne();
+					let num = $("#num").val();
+					let url = "orderConfirm.html?pid=" + pid + "&num=" + num
+					location.href = url;
+				})
+
+				//给加入收藏按钮绑定点击事件
+				$("#btn-add-to-collect").click(function () {
+					//判断是否登录
+					if (sessionStorage.getItem("user") == null){
+						alert("您尚未登录，请先登录！")
+						location.href = "login.html"
+						return false;
+					}
+					if (confirm("确定要将此商品加入收藏吗？")){
+						$.ajax({
+							url: "/favorites/addFavorites",
+							type: "post",
+							data: {pid:pid},
+							dataType: "json",
+							success: function (res) {
+								alert("收藏成功！")
+							},
+							error : function (err) {
+								alert("服务器出现错误，加入购物车失败！")
+							}
+						})
+					}
+				})
+			})
+		</script>
+	</head>
+
+	<body>
+		<!--头部开始-->
+		<div class="header"></div>
+		<!--头部结束-->
+
+		<!--中间导航条开始 -->
+		<div class="middleNavigation"></div>
+		<!--中间导航条结束-->
+
+		<!--商品信息展示开始-->
+		<div class="container">
+			<div class="col-md-offset-1 col-md-10">
+				<div class="col-md-6">
+					<div data="1" class="img-big move-img col-md-12">
+						<img id="product-image-1-big"  class="img-responsive" />
+					</div>
+					<div data="2" class="img-big move-img col-md-12">
+						<img id="product-image-2-big"  class="img-responsive" />
+					</div>
+					<div data="3" class="img-big move-img col-md-12">
+						<img id="product-image-3-big"  class="img-responsive" />
+					</div>
+					<div data="4" class="img-big move-img col-md-12">
+						<img id="product-image-4-big"  class="img-responsive" />
+					</div>
+					<div data="5" class="img-big move-img col-md-12">
+						<img id="product-image-5-big"  class="img-responsive" />
+					</div>
+					<div data="1" class="col-md-2 img-small">
+						<img id="product-image-1"  class="img-responsive" />
+					</div>
+					<div data="2" class="col-md-2 img-small">
+						<img id="product-image-2"  class="img-responsive" />
+					</div>
+					<div data="3" class="col-md-2 img-small">
+						<img id="product-image-3"  class="img-responsive" />
+					</div>
+					<div data="4" class="col-md-2 img-small">
+						<img id="product-image-4"  class="img-responsive" />
+					</div>
+					<div data="5" class="col-md-2 img-small">
+						<img id="product-image-5"  class="img-responsive" />
+					</div>
+				</div>
+				<div class="col-md-6">
+					<h3 id="product-title" class="col-md-12 title-row-2"></h3>
+					<p class="col-md-12 text-row-2">
+						<middle id="product-sell-point" > 卖点：</middle>
+					</p>
+					<div class="col-md-12 price-bar">
+						<small>学员售价：</small> ¥<span id="product-price"></span>
+						<div><small>*退货补运费 *7天无理由退货 *24小时快速退款 </small></div>
+					</div>
+					<form class="form-inline product-form col-md-12" role="form">
+						<div class="col-md-12 form-space">
+							<label >数量：</label>
+							<input id="numDown" type="button" value="-" class="num-btn" />
+							<input id="num" type="text" size="2" readonly="readonly" class="num-text" value="1">
+							<input id="numUp" class="num-btn" type="button" value="+" />
+						</div>
+						<div class="col-md-12 form-space">
+							<label >剩余库存：</label>
+							<span id="stock" style="color: red;font-weight: bold"></span>
+						</div>
+						<div class="col-md-12 form-space">
+							<p><small><b>电脑商城</b>发货并提供售后服务,今日下单,明日送达</small></p>
+						</div>
+						<div class="col-md-12 form-space">
+							<input id="buyRightNow" class="btn btn-primary btn-lg btn-block" type="button" value="立即购买">
+						</div>
+						<div class="col-md-12 form-space">
+							<button id="btn-add-to-cart" type="button" class="btn btn-default go-cart"><span class="fa fa-cart-plus"></span> 加入购物车</button>
+							<button id="btn-add-to-collect" type="button" class="btn btn-default"><span class="fa fa-heart-o"></span> 加入收藏</button>
+						</div>
+					</form>
+				</div>
+			</div>
+			<!--商品信息展示结束-->
+			<!--售后信息开始-->
+			<div class="col-md-offset-1 col-md-10">
+				<div class="panel panel-default">
+					<div class="panel-heading">
+						<h2 class="panel-title">售后保障</h2>
+					</div>
+					<div class="panel-body ">
+						<div class="row">
+							<div class="col-md-1 saled-icon"><span class="fa fa-shield"></span></div>
+							<div class="col-md-11 saled-title">正品保障</div>
+						</div>
+						<div class="row">
+							<p class="col-md-offset-1 col-md-11 saled-content">电脑商城向您保证所售商品均为正品行货，电脑商城自营商品开具机打发票或电子发票。</p>
+						</div>
+						<div class="row">
+							<div class="col-md-1 saled-icon"><span class="fa fa-wrench"></span></div>
+							<div class="col-md-11 saled-title">厂家服务</div>
+						</div>
+						<div class="row">
+							<p class="col-md-offset-1 col-md-11 saled-content">本产品全国联保，享受三包服务，质保期为：二年质保</p>
+						</div>
+						<div class="row">
+							<div class="col-md-1 saled-icon"><span class="fa fa-heartbeat"></span></div>
+							<div class="col-md-11 saled-title">郑重承诺</div>
+						</div>
+						<div class="row">
+							<p class="col-md-offset-1 col-md-11 saled-content">电脑商城销售并发货的商品，由电脑商城提供发票和相应的售后服务。请您放心购买！
+								<br /> 注：因厂家会在没有任何提前通知的情况下更改产品包装、产地或者一些附件，本司不能确保客户收到的货物与商城图片、产地、附件说明完全一致。只能确保为原厂正货！并且保证与当时市场上同样主流新品一致。若本商城没有及时更新，请大家谅解！
+							</p>
+						</div>
+						<div class="row">
+							<div class="col-md-1 saled-icon"><span class="fa fa-globe"></span></div>
+							<div class="col-md-11 saled-title">全国联保</div>
+						</div>
+						<div class="row">
+							<p class="col-md-offset-1 col-md-11 saled-content">
+								凭质保证书及电脑商城发票，可享受全国联保服务（奢侈品、钟表除外；奢侈品、钟表由电脑商城联系保修，享受法定三包售后服务），与您亲临商场选购的商品享受相同的质量保证。电脑商城还为您提供具有竞争力商品价格和运费政策，请您放心购买！
+								<br /> 注：因厂家会在没有任何提前通知的情况下更改产品包装、产地或者一些附件，本司不能确保客户收到的货物与商城图片、产地、附件说明完全一致。只能确保为原厂正货！并且保证与当时市场上同样主流新品一致。若本商城没有及时更新，请大家谅解！
+							</p>
+						</div>
+						<div class="row">
+							<div class="col-md-1 saled-icon"><span class="fa fa-reply"></span></div>
+							<div class="col-md-11 saled-title">无忧退货</div>
+						</div>
+						<div class="row">
+							<p class="col-md-offset-1 col-md-11 saled-content">客户购买电脑商城商品7日内（含7日，自客户收到商品之日起计算），在保证商品完好的前提下，可无理由退货。（部分商品除外，详情请见各商品细则）</p>
+						</div>
+						<div class="saled-content">
+							<small><b>权利声明：</b><br />
+						所有商品信息、商品咨询等内容，是电脑商城重要的经营资源，未经许可，禁止非法转载使用。<br />
+						注：本站商品信息均来自于合作方，其真实性、准确性和合法性由信息拥有者（合作方）负责。本站不提供任何保证，并不承担任何法律责任。</small>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+
+
+		<div class="clearfix"></div>
+		<!--页脚开始-->
+		<div class="footer"></div>
+		<!--页脚结束-->
+	</body>
+
+</html>

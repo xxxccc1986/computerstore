@@ -1,0 +1,27 @@
+/* 索引页大背景*/
+.mycontent {
+	background-image: url(../images/index/bg1.png);
+	background-repeat: no-repeat;
+	width: 100%;
+	height: 561px;
+}
+/*索引页半透明层*/
+.inputDiv {
+	height: 371px;
+	width: 270px;
+	background-color: rgba(255, 255, 255, 0.7);
+	float: right;
+	margin: 100px 60px 0 0;
+	text-align: center;
+	color: cadetblue;
+	line-height: 40px;
+}
+/*索引页几个链接按钮*/
+.inputDiv a {
+	margin: 8px;
+	font-size: 16px;
+}
+/*按钮宽度	*/
+.inputDiv .btn {
+	width: 90%;
+}

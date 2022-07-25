@@ -1,0 +1,16 @@
+/*表格文字居中*/
+.orders-table {
+	text-align: center;
+}
+/*表头文字居中*/
+.orders-table th {
+	text-align: center;
+}
+/*数量数字居中*/
+.orders-table input {
+	text-align: center;
+}
+/*每行间隙*/
+.orders-table tbody tr {
+	border-top: 1px dashed #cccccc;
+}

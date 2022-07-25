@@ -1,0 +1,27 @@
+/*表格文字居中*/
+.cart-table {
+	text-align: center;
+}
+/*表头文字居中*/
+.cart-table th {
+	text-align: center;
+}
+/*数量数字居中*/
+.cart-table input {
+	text-align: center;
+}
+/*加减按钮宽度*/
+.num-btn {
+	width: 30px;
+}
+/*每行间隙*/
+.cart-table tbody tr {
+	border-top: 1px dashed #cccccc;
+}
+/*总价条*/
+.total-bar {
+	margin: 20px 0;
+	background-color: #f0f7fe;
+	padding: 15px;
+	border-radius: 5px;
+}

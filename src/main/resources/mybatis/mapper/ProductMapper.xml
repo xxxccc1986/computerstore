@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="top.year21.computerstore.mapper.ProductMapper">
+    <!--   自定义结果集的映射规则 -->
+    <resultMap id="queryProduct" type="product">
+        <id property="id" column="id"/>
+        <result property="categoryId" column="category_id"/>
+        <result property="itemType" column="item_type"/>
+        <result property="title" column="title"/>
+        <result property="sellPoint" column="sell_point"/>
+        <result property="price" column="price"/>
+        <result property="num" column="num"/>
+        <result property="image" column="image"/>
+        <result property="status" column="status"/>
+        <result property="priority" column="priority"/>
+        <result property="createdTime" column="created_time"/>
+        <result property="modifiedTime" column="modified_time"/>
+        <result property="createdUser" column="created_user"/>
+        <result property="modifiedUser" column="modified_user"/>
+    </resultMap>
+
+<!--List<Product> queryPriorityProduct();-->
+    <select id="queryPriorityProduct" resultMap="queryProduct">
+        SELECT id,title,price,image FROM t_product
+                                    where status = 1
+                                    ORDER BY priority DESC
+                                    LIMIT 0,4 ;
+    </select>
+
+<!--    List<Product> queryTheNewProduct();-->
+    <select id="queryTheNewProduct" resultMap="queryProduct">
+       SELECT id,title,price,image FROM t_product
+                                    WHERE category_id = 163
+                                    and status = 1
+                                    ORDER BY created_time DESC
+                                    LIMIT 0,4 ;
+    </select>
+
+<!--     Product queryProductById(Integer id);-->
+    <select id="queryProductById" resultMap="queryProduct">
+        select title,sell_point,price,image,status,num from t_product where id = #{id}
+    </select>
+
+<!--List<Product> queryProductByTitle(String title);-->
+<!-- 模糊查询,只能使用${},若使用#{}，占位符会被解析成？，当中参数里面的一部分，而不是起填充的作用-->
+    <select id="queryProductByTitle" resultMap="queryProduct">
+        SELECT id,title,sell_point,price,image
+        FROM t_product
+        WHERE STATUS = 1
+        AND title LIKE '%${title}%'
+        ORDER BY priority DESC
+    </select>
+</mapper>

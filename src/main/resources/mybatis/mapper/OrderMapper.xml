@@ -1,0 +1,106 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="top.year21.computerstore.mapper.OrderMapper">
+<!--    定义自定义的映射规则-->
+        <resultMap id="queryOrder" type="order">
+            <id property="oid" column="oid"/>
+            <result property="uid" column="uid"/>
+            <result property="aid" column="aid"/>
+            <result property="recvName" column="recv_name"/>
+            <result property="recvPhone" column="recv_phone"/>
+            <result property="recvProvince" column="recv_province"/>
+            <result property="recvCity" column="recv_city"/>
+            <result property="recvArea" column="recv_area"/>
+            <result property="recvAddress" column="recv_address"/>
+            <result property="totalPrice" column="total_price"/>
+            <result property="status" column="status"/>
+            <result property="orderTime" column="order_time"/>
+            <result property="payTime" column="pay_time"/>
+            <result property="createdUser" column="created_user"/>
+            <result property="createdTime" column="created_time"/>
+            <result property="modifiedUser" column="modified_user"/>
+            <result property="modifiedTime" column="modified_time"/>
+        </resultMap>
+
+        <resultMap id="queryOrderItem" type="orderItem">
+            <id property="id" column="id"/>
+            <result property="oid" column="oid"/>
+            <result property="pid" column="pid"/>
+            <result property="title" column="title"/>
+            <result property="image" column="image"/>
+            <result property="price" column="price"/>
+            <result property="num" column="num"/>
+            <result property="createdUser" column="created_user"/>
+            <result property="createdTime" column="created_time"/>
+            <result property="modifiedUser" column="modified_user"/>
+            <result property="modifiedTime" column="modified_time"/>
+        </resultMap>
+
+<!--    int insertOneOrder(Order order);-->
+    <insert id="insertOneOrder" useGeneratedKeys="true" keyProperty="oid">
+        insert into t_order(uid,aid,recv_name,recv_phone,recv_province,
+                            recv_city,recv_area,recv_address,
+                            total_price,status,order_time,pay_time,
+                            created_user,created_time,modified_user,modified_time)
+                        values(
+                            #{uid},#{aid},#{recvName},#{recvPhone},#{recvProvince},#{recvCity},
+                            #{recvArea},#{recvAddress},#{totalPrice},#{status},#{orderTime},
+                            #{payTime},#{createdUser},#{createdTime},#{modifiedUser},#{modifiedTime}
+                               )
+    </insert>
+
+<!--    int insertOneOrderItem(OrderItem orderItem);-->
+    <insert id="insertOneOrderItem">
+        insert into t_order_item(oid,pid,title,image,price,num,
+                        created_user,created_time,modified_user,modified_time)
+                        values(#{oid},#{pid},#{title},#{image},#{price},
+                               #{num},#{createdUser},#{createdTime},#{modifiedUser},#{modifiedTime}
+                          )
+    </insert>
+
+<!--    Order queryOrderByOid(Integer oid);-->
+    <select id="queryOrderByOid" resultMap="queryOrder">
+        select * from t_order where oid = #{oid};
+    </select>
+
+<!--int updateStatusByOidInt(Integer oid, Integer status, Date payTime);-->
+    <update id="updateStatusByOidInt">
+       update t_order set status = #{status},pay_time = #{payTime} where oid = #{oid}
+    </update>
+
+<!--    List<OrderItem> queryOrderItemByOid(Integer oid);-->
+    <select id="queryOrderItemByOid" resultMap="queryOrderItem">
+        SELECT * FROM t_order_item WHERE oid = #{oid}
+    </select>
+
+<!--    List<OrderVo> queryOrderVoByOid(Integer oid);-->
+    <select id="queryOrderVoByOid" resultType="top.year21.computerstore.vo.OrderVo">
+       SELECT   od.`oid`,od.`aid`,od.`recv_name` AS recvName,od.`total_price`AS totalPrice,
+                od.`status`,od.`order_time` AS orderTime,od.`pay_time` AS payTime,
+                orm.`image`,orm.`title`,
+                orm.`price`,orm.`num`
+        FROM t_order od
+        LEFT JOIN t_order_item orm
+        ON od.`oid` = orm.`oid`
+        WHERE od.oid = #{oid}
+        ORDER BY orm.`price` DESC;
+    </select>
+
+<!--    List<OrderVo> queryOrderVoByUid(Integer uid,Integer status);-->
+    <select id="queryOrderVoByUid" resultType="top.year21.computerstore.vo.OrderVo">
+       SELECT od.`oid`,od.`aid`,od.`recv_name` as recvName,od.`total_price` AS totalPrice,
+       od.`status`,od.`order_time` AS orderTime,
+       orm.`image`,orm.`title`,
+       orm.`price`,orm.`num`
+        FROM t_order od
+        LEFT JOIN t_order_item orm
+        ON od.`oid` = orm.`oid`
+        WHERE od.uid = #{uid}
+        <if test="status !=null">
+            and od.status = #{status}
+        </if>
+        ORDER BY od.`order_time` DESC;
+    </select>
+</mapper>

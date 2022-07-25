@@ -1,0 +1,27 @@
+/*高亮显示的*/
+.order-bar-active {
+	background-color: #4288c3;
+	color: #ffffff;
+	min-height: 30px;
+	line-height: 30px;
+	text-align: center;
+	border-radius: 5px;
+}
+/*非高亮显示的*/
+.order-bar-undo {
+	background-color: #cccccc;
+	min-height: 30px;
+	line-height: 30px;
+	text-align: center;
+	border-radius: 5px;
+}
+.pay-bar {
+	height: 70px;
+}
+.pay-res {
+	color: #4288c3;
+	font-size: 40px;
+}
+.pay-res-icon {
+	font-size: 50px;
+}

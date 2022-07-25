@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="top.year21.computerstore.mapper.CartMapper">
+<!--  自定义映射规则  -->
+    <resultMap id="queryCart" type="cart">
+        <id property="cid" column="cid"/>
+        <result property="uid" column="uid"/>
+        <result property="pid" column="pid"/>
+        <result property="price" column="price"/>
+        <result property="num" column="num"/>
+        <result property="createdUser" column="created_user"/>
+        <result property="createdTime" column="created_time"/>
+        <result property="modifiedUser" column="modified_user"/>
+        <result property="modifiedTime" column="modified_time"/>
+    </resultMap>
+
+<!--Cart queryCartByUidAndPid(Integer uid, @Param("pid") Integer pid);-->
+    <select id="queryCartByUidAndPid" resultMap="queryCart">
+        select * from t_cart where uid = #{uid} and pid = #{pid}
+    </select>
+
+<!--    int updateCartInfo(Cart cart);-->
+    <update id="updateCartInfo" parameterType="cart">
+        update t_cart set num = #{num},modified_user = #{modifiedUser},modified_time = #{modifiedTime}
+                          where cid = #{cid}
+    </update>
+
+<!--    int addCart(Cart cart);-->
+    <insert id="addCart">
+        insert into t_cart(uid,pid,price,num,created_user,created_time,modified_user,modified_time)
+                          values(#{uid},#{pid},#{price},#{num},
+                                 #{createdUser},#{createdTime},
+                                 #{modifiedUser},#{modifiedTime}
+                                 )
+    </insert>
+
+<!--    List<Cart> queryAllCartsByUid(Integer uid);-->
+    <select id="queryAllCartsByUid" resultType="top.year21.computerstore.vo.CartVo">
+        SELECT c.cid,c.pid,c.`uid`,c.price,c.num,p.title,p.image,p.`price` AS real_price
+                                                FROM t_cart c LEFT JOIN t_product p
+                                                ON c.pid = p.`id`
+                                                WHERE c.`uid` = #{uid}
+                                                order by c.created_time desc
+    </select>
+
+<!--     Cart queryCartByCid(Integer cid);-->
+    <select id="queryCartByCid" resultMap="queryCart">
+            select * from t_cart where cid = #{cid};
+    </select>
+
+<!--    int UpdateCartNumByCid(Integer num,String modifiedUser, Date modifiedTime,Integer cid);-->
+    <update id="UpdateCartNumByCid" >
+        update t_cart set num = #{num},modified_user = #{modifiedUser},modified_time = #{modifiedTime}
+                          where cid = #{cid}
+    </update>
+
+<!--    CartVo queryCartVoByCid(Integer cid);-->
+    <select id="queryCartVoByCid" resultType="top.year21.computerstore.vo.CartVo">
+        SELECT c.cid,c.pid,c.`uid`,c.price,c.num,p.title,p.image,p.`price` AS real_price
+                                                FROM t_cart c LEFT JOIN t_product p
+                                                ON c.pid = p.`id`
+                                                WHERE c.`cid` = #{cid}
+                                                order by c.created_time desc
+    </select>
+
+<!--    int deleteCartByCid(Integer cid);-->
+    <delete id="deleteCartByCid">
+        delete from t_cart where cid = #{cid}
+    </delete>
+
+<!--    int deleteCartByUidAndPid(Integer uid,Integer pid);-->
+    <delete id="deleteCartByUidAndPid">
+        DELETE FROM t_cart WHERE uid = #{uid} AND pid = #{pid}
+    </delete>
+</mapper>
